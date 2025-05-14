@@ -76,4 +76,11 @@ namespace vkb
     {
         glfwSetWindowShouldClose(handle, GLFW_TRUE);
     }
+
+    std::vector<const char*> GlfwWindow::get_required_surface_extensions() const
+    {
+        uint32_t glfw_extension_count{ 0 };
+        const char** names = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+        return { names, names + glfw_extension_count };
+    }
 }
