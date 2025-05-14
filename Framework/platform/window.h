@@ -1,7 +1,5 @@
 #pragma once
 
-#include "common/vk_common.h"
-
 namespace vkb
 {
     /**
