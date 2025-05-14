@@ -4,7 +4,8 @@
 
 namespace vkb
 {
-    Application::Application(const Window::Properties& properties)
+    Application::Application(const Window::Properties& properties) :
+        name{"Sample Name"}
     {
         window = std::make_unique<GlfwWindow>(properties);
     }
@@ -46,7 +47,15 @@ namespace vkb
 
     void Application::update(float delta_time)
     {
-        fps        = 1.0f / delta_time;
-        frame_time = delta_time * 1000.0f;
+    }
+
+    const std::string& Application::get_name() const
+    {
+        return name;
+    }
+
+    void Application::set_name(const std::string& name_)
+    {
+        name = name_;
     }
 }
