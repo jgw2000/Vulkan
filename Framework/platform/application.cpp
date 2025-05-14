@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "application.h"
 #include "glfw_window.h"
 
@@ -10,6 +11,11 @@ namespace vkb
 
     void Application::start()
     {
+        if (!prepare())
+        {
+            throw std::runtime_error("Application::prepare failed.");
+        }
+
         if (!window)
         {
             throw std::runtime_error("Window couldn't be created.");
@@ -33,7 +39,7 @@ namespace vkb
     {
     }
 
-    bool Application::resize(const uint32_t /*width*/, const uint32_t /*height*/)
+    bool Application::resize(uint32_t /*width*/, uint32_t /*height*/)
     {
         return true;
     }
