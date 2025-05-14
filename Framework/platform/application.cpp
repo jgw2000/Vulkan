@@ -33,6 +33,11 @@ namespace vkb
     {
     }
 
+    bool Application::resize(const uint32_t /*width*/, const uint32_t /*height*/)
+    {
+        return true;
+    }
+
     void Application::update(float delta_time)
     {
         fps        = 1.0f / delta_time;
