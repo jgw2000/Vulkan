@@ -1,5 +1,8 @@
 #pragma once
 
+#include "platform/application.h"
+#include "platform/window.h"
+
 namespace vkb
 {
     /**
@@ -69,4 +72,36 @@ namespace vkb
      * - BufferPool
      * - Core classes: Classes in vkb::core wrap Vulkan objects for indexing and hashing.
      */
+
+    class VulkanSample : public vkb::Application
+    {
+        /// <summary>
+        /// PUBLIC INTERFACE
+        /// </summary>
+    public:
+        VulkanSample(const Window::Properties& properties);
+        ~VulkanSample() override;
+
+        /// <summary>
+        /// PROTECTED VIRTUAL INTERFACE
+        /// </summary>
+    protected:
+        /**
+        * @brief Additional sample initialization
+        */
+        bool prepare() override;
+
+        /**
+        * @brief Main loop sample events
+        */
+        void update(float delta_time) override;
+
+        void finish() override;
+        bool resize(uint32_t width, uint32_t height) override;
+
+        /**
+         * @brief Create the Vulkan instance used by this sample
+         * @note Can be overridden to implement custom instance creation
+         */
+    };
 }
