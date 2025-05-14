@@ -62,6 +62,8 @@ namespace vkb
          */
         virtual void close() = 0;
 
+        virtual std::vector<const char*> get_required_surface_extensions() const = 0;
+
         /**
          * @brief Attempt to resize the window - not guaranteed to change
          *
