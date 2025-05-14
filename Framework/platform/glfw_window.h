@@ -21,6 +21,8 @@ namespace vkb
 
         void close() override;
 
+        std::vector<const char*> get_required_surface_extensions() const override;
+
     private:
         GLFWwindow* handle = nullptr;
     };
