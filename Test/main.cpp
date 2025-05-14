@@ -1,7 +1,11 @@
 #include "platform/application.h"
 
 int main() {
-    vkb::Window::Properties properties;
+    vkb::Window::Properties properties =
+    {
+        "Sample"
+    };
+
     vkb::Application app(properties);
     app.start();
 
