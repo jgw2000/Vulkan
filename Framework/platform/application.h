@@ -1,6 +1,5 @@
 #pragma once
 
-#include "common/vk_common.h"
 #include "window.h"
 
 namespace vkb
@@ -35,7 +34,7 @@ namespace vkb
          * @param width New width of the window
          * @param height New height of the window
          */
-        virtual bool resize(const uint32_t width, const uint32_t height);
+        virtual bool resize(uint32_t width, uint32_t height);
 
         std::unique_ptr<Window> window{ nullptr };
 
