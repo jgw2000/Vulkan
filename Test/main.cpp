@@ -1,4 +1,5 @@
-#include "platform/application.h"
+#include "stdafx.h"
+#include "vulkan_sample.h"
 
 int main() {
     vkb::Window::Properties properties =
@@ -6,7 +7,7 @@ int main() {
         "Sample"
     };
 
-    vkb::Application app(properties);
+    vkb::VulkanSample app(properties);
     app.start();
 
     return 0;
