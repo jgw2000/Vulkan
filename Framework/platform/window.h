@@ -64,6 +64,14 @@ namespace vkb
          */
         virtual void close() = 0;
 
+        /**
+         * @brief Attempt to resize the window - not guaranteed to change
+         *
+         * @param extent The preferred window extent
+         * @return Extent The new window extent
+         */
+        Extent resize(const Extent& extent);
+
         const Extent& get_extent() const;
 
         Mode get_window_mode() const;
