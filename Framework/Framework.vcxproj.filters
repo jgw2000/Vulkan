@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="platform">
       <UniqueIdentifier>{8ce17a23-d602-4548-a0e3-ff4142116c46}</UniqueIdentifier>
     </Filter>
-    <Filter Include="common">
-      <UniqueIdentifier>{6d9d515e-1cd7-475f-8931-5f4b92f028d6}</UniqueIdentifier>
+    <Filter Include="core">
+      <UniqueIdentifier>{2be42d33-8b67-4d69-95b8-ef1ee7f85eab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -15,13 +15,14 @@
     <ClInclude Include="platform\window.h">
       <Filter>platform</Filter>
     </ClInclude>
-    <ClInclude Include="common\vk_common.h">
-      <Filter>common</Filter>
-    </ClInclude>
     <ClInclude Include="platform\glfw_window.h">
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="vulkan_sample.h" />
+    <ClInclude Include="core\hpp_instance.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -30,11 +31,13 @@
     <ClCompile Include="platform\window.cpp">
       <Filter>platform</Filter>
     </ClCompile>
-    <ClCompile Include="common\vk_common.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="platform\glfw_window.cpp">
       <Filter>platform</Filter>
     </ClCompile>
+    <ClCompile Include="vulkan_sample.cpp" />
+    <ClCompile Include="core\hpp_instance.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
 </Project>
