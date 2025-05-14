@@ -36,11 +36,13 @@ namespace vkb
          */
         virtual bool resize(uint32_t width, uint32_t height);
 
+        const std::string& get_name() const;
+
+        void set_name(const std::string& name);
+
         std::unique_ptr<Window> window{ nullptr };
 
     private:
-        float fps{ 0.0f };
-        float frame_time{ 0.0f };
-        uint32_t frame_count{ 0 };
+        std::string name{};
     };
 }
