@@ -11,6 +11,17 @@ namespace vkb
     {
     }
 
+    Window::Extent Window::resize(const Extent& new_extent)
+    {
+        if (properties.resizable)
+        {
+            properties.extent.width = new_extent.width;
+            properties.extent.height = new_extent.height;
+        }
+
+        return properties.extent;
+    }
+
     const Window::Extent& Window::get_extent() const
     {
         return properties.extent;
