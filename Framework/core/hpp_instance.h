@@ -62,5 +62,17 @@ namespace vkb::core
 		 * @brief The enabled extensions
 		 */
 		std::vector<const char*> enabled_extensions;
+
+#if defined(_DEBUG)
+		/**
+		 * @brief Debug utils messenger callback for VK_EXT_Debug_Utils
+		 */
+		vk::DebugUtilsMessengerEXT debug_utils_messenger;
+
+		/**
+		 * @brief The debug report callback
+		 */
+		vk::DebugReportCallbackEXT debug_report_callback;
+#endif
 	};
 }
