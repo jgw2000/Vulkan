@@ -73,6 +73,11 @@ namespace vkb
      * - Core classes: Classes in vkb::core wrap Vulkan objects for indexing and hashing.
      */
 
+    namespace core
+    {
+        class HPPInstance;
+    }
+
     class VulkanSample : public vkb::Application
     {
         /// <summary>
@@ -103,5 +108,73 @@ namespace vkb
          * @brief Create the Vulkan instance used by this sample
          * @note Can be overridden to implement custom instance creation
          */
+        virtual std::unique_ptr<core::HPPInstance> create_instance();
+
+        /**
+         * @brief Add a sample-specific instance extension
+         * @param extension The extension name
+         */
+        void add_instance_extension(const char* extension);
+
+        /**
+         * @brief Add a sample-specific instance layer
+         * @param layer The layer name
+         */
+        void add_instance_layer(const char* layer);
+
+        /**
+         * @brief Add a sample-specific layer setting
+         * @param layerSetting The layer setting
+         */
+        void add_layer_setting(const vk::LayerSettingEXT& layerSetting);
+
+        core::HPPInstance& get_instance();
+        const core::HPPInstance& get_instance() const;
+
+        /// <summary>
+        /// PRIVATE INTERFACE
+        /// </summary>
+    private:
+        /**
+         * @brief Get sample-specific instance extensions.
+         *
+         * @return Vector of instance extensions. Default is empty vector.
+         */
+        const std::vector<const char*>& get_instance_extensions() const;
+
+        /**
+         * @brief Get sample-specific instance layers.
+         *
+         * @return Vector of instance layers. Default is empty vector.
+         */
+        const std::vector<const char*>& get_instance_layers() const;
+
+        /**
+         * @brief Get sample-specific layer settings.
+         *
+         * @return Vector of layer settings. Default is empty vector.
+         */
+        const std::vector<vk::LayerSettingEXT>& get_layer_settings() const;
+
+        /// <summary>
+        /// PRIVATE MEMBERS
+        /// </summary>
+    private:
+        /**
+         * @brief The Vulkan instance
+         */
+        std::unique_ptr<core::HPPInstance> instance;
+
+        /** @brief Vector of instance extensions to be enabled for this example (must be set in the derived constructor) */
+        std::vector<const char*> instance_extensions;
+
+        /** @brief Vector of instance layers to be enabled for this example (must be set in the derived constructor) */
+        std::vector<const char*> instance_layers;
+
+        /** @brief Vector of layer settings to be enabled for this example (must be set in the derived constructor) */
+        std::vector<vk::LayerSettingEXT> layer_settings;
+
+        /** @brief The Vulkan API version to request for this sample at instance creation time */
+        uint32_t api_version = VK_API_VERSION_1_0;
     };
 }
