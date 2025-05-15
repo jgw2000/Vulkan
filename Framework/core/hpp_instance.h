@@ -2,6 +2,8 @@
 
 namespace vkb::core
 {
+    class HPPPhysicalDevice;
+
     /**
      * @brief A wrapper class for vk::Instance
      *
@@ -11,6 +13,11 @@ namespace vkb::core
     class HPPInstance
     {
     public:
+        /**
+         * @brief Can be set from the GPU selection plugin to explicitly select a GPU instead
+         */
+        static std::optional<uint32_t> selected_gpu_index;
+
         /**
          * @brief Can be set from the GPU selection plugin to explicitly select a GPU instead
          */
@@ -47,12 +54,24 @@ namespace vkb::core
         vk::Instance get_handle() const;
 
         /**
+         * @brief Tries to find the first available discrete GPU that can render to the given surface
+         * @param surface to test against
+         * @returns A valid physical device
+         */
+        HPPPhysicalDevice& get_suitable_gpu(vk::SurfaceKHR surface);
+
+        /**
          * @brief Checks if the given extension is enabled in the vk::Instance
          * @param extension An extension to check
          */
         bool is_enabled(const char* extension) const;
 
     private:
+        /**
+         * @brief Queries the instance for the physical devices on the machine
+         */
+        void query_gpus();
+
         /**
          * @brief The Vulkan instance
          */
@@ -74,5 +93,10 @@ namespace vkb::core
          */
         vk::DebugReportCallbackEXT debug_report_callback;
 #endif
+
+        /**
+         * @brief The physical devices found on the machine
+         */
+        std::vector<std::unique_ptr<HPPPhysicalDevice>> gpus;
     };
 }
