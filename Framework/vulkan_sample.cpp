@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "vulkan_sample.h"
 #include "core/hpp_instance.h"
+#include "core/hpp_physical_device.h"
 
 namespace vkb
 {
@@ -11,6 +12,12 @@ namespace vkb
 
     VulkanSample::~VulkanSample()
     {
+        if (surface)
+        {
+            instance->get_handle().destroySurfaceKHR(surface);
+        }
+
+        instance.reset();
     }
 
     bool VulkanSample::prepare()
@@ -28,7 +35,7 @@ namespace vkb
             throw std::runtime_error("volkInitialize failed.");
         }
 
-        // Creating the vulkan instance
+        // 1. Creating the vulkan instance
         for (const char* extension_name : window->get_required_surface_extensions())
         {
             add_instance_extension(extension_name);
@@ -48,6 +55,30 @@ namespace vkb
 #endif
 
         instance = create_instance();
+
+        // 2. Getting a valid vulkan surface from the platform
+        surface = static_cast<vk::SurfaceKHR>(window->create_surface(static_cast<VkInstance>(instance->get_handle())));
+        if (!surface)
+        {
+            throw std::runtime_error("Failed to create window surface.");
+        }
+
+        auto& gpu = instance->get_suitable_gpu(surface);
+        gpu.set_high_priority_graphics_queue_enable(high_priority_graphics_queue);
+
+        // Request to enable ASTC
+        if (gpu.get_features().textureCompressionASTC_LDR)
+        {
+            gpu.get_mutable_requested_features().textureCompressionASTC_LDR = true;
+        }
+
+        // Request sample required GPU features
+        request_gpu_features(gpu);
+
+        // Creating vulkan device, specifying the swapchain extension always
+        add_device_extension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
+
+        // 3. Creating the logical device
 
         return true;
     }
@@ -77,6 +108,11 @@ namespace vkb
         return std::make_unique<core::HPPInstance>(get_name(), get_instance_extensions(), get_instance_layers(), get_layer_settings(), api_version);
     }
 
+    void VulkanSample::add_device_extension(const char* extension)
+    {
+        device_extensions.emplace_back(extension);
+    }
+
     void VulkanSample::add_instance_extension(const char* extension)
     {
         instance_extensions.emplace_back(extension);
@@ -100,6 +136,11 @@ namespace vkb
     const core::HPPInstance& VulkanSample::get_instance() const
     {
         return *instance;
+    }
+
+    const std::vector<const char*>& VulkanSample::get_device_extensions() const
+    {
+        return device_extensions;
     }
 
     const std::vector<const char*>& VulkanSample::get_instance_extensions() const
