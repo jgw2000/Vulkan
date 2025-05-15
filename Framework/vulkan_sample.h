@@ -76,6 +76,7 @@ namespace vkb
     namespace core
     {
         class HPPInstance;
+        class HPPPhysicalDevice;
     }
 
     class VulkanSample : public vkb::Application
@@ -105,10 +106,36 @@ namespace vkb
         bool resize(uint32_t width, uint32_t height) override;
 
         /**
+         * @brief Request features from the gpu based on what is supported
+         */
+        virtual void request_gpu_features(core::HPPPhysicalDevice& gpu) {}
+
+        /**
+         * @brief Set the Vulkan API version to request at instance creation time
+         */
+        void set_api_version(uint32_t requested_api_version) { api_version = requested_api_version; }
+
+        /**
+         * @brief Sets whether or not the first graphics queue should have higher priority than other queues.
+         * Very specific feature which is used by async compute samples.
+         * Needs to be called before prepare().
+         * @param enable If true, present queue will have prio 1.0 and other queues have prio 0.5.
+         * Default state is false, where all queues have 0.5 priority.
+         */
+        void set_high_priority_graphics_queue_enable(bool enable) { high_priority_graphics_queue = enable; }
+
+        /**
          * @brief Create the Vulkan instance used by this sample
          * @note Can be overridden to implement custom instance creation
          */
         virtual std::unique_ptr<core::HPPInstance> create_instance();
+
+        /**
+         * @brief Add a sample-specific device extension
+         * @param extension The extension name
+         * @param optional (Optional) Whether the extension is optional
+         */
+        void add_device_extension(const char* extension);
 
         /**
          * @brief Add a sample-specific instance extension
@@ -135,6 +162,13 @@ namespace vkb
         /// PRIVATE INTERFACE
         /// </summary>
     private:
+        /**
+         * @brief Get sample-specific device extensions.
+         *
+         * @return Vector of device extensions. Default is empty vector.
+         */
+        const std::vector<const char*>& get_device_extensions() const;
+
         /**
          * @brief Get sample-specific instance extensions.
          *
@@ -165,6 +199,15 @@ namespace vkb
          */
         std::unique_ptr<core::HPPInstance> instance;
 
+        /**
+         * @brief The Vulkan surface
+         */
+        vk::SurfaceKHR surface;
+
+        /** @brief Vector of device extensions to be enabled for this example(must be set in the derived constructor) */
+        std::vector<const char*> device_extensions;
+
+
         /** @brief Vector of instance extensions to be enabled for this example (must be set in the derived constructor) */
         std::vector<const char*> instance_extensions;
 
@@ -176,5 +219,8 @@ namespace vkb
 
         /** @brief The Vulkan API version to request for this sample at instance creation time */
         uint32_t api_version = VK_API_VERSION_1_0;
+
+        /** @brief Whether or not we want a high priority graphics queue. */
+        bool high_priority_graphics_queue{ false };
     };
 }
