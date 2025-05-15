@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "hpp_instance.h"
+#include "hpp_physical_device.h"
 
 #if defined(_DEBUG)
 #   define USE_VALIDATION_LAYERS
@@ -64,6 +65,8 @@ namespace vkb
 
 namespace vkb::core
 {
+    std::optional<uint32_t> HPPInstance::selected_gpu_index;
+
     namespace
     {
         bool enable_extension(const char*                                 requested_extension,
@@ -237,6 +240,8 @@ namespace vkb::core
             debug_report_callback = handle.createDebugReportCallbackEXT(debug_report_create_info);
         }
 #endif
+
+        query_gpus();
     }
 
     HPPInstance::HPPInstance(vk::Instance instance) :
@@ -273,9 +278,59 @@ namespace vkb::core
         return handle;
     }
 
+    HPPPhysicalDevice& HPPInstance::get_suitable_gpu(vk::SurfaceKHR surface)
+    {
+        assert(!gpus.empty() && "No physical devices were found on the system.");
+
+        if (selected_gpu_index.has_value())
+        {
+            if (selected_gpu_index.value() > gpus.size() - 1)
+            {
+                throw std::runtime_error("Selected GPU index is not within on. of available GPUSs");
+            }
+            return *gpus[selected_gpu_index.value()];
+        }
+
+        // Find a discrete GPU
+        for (auto& gpu : gpus)
+        {
+            if (gpu->get_properties().deviceType == vk::PhysicalDeviceType::eDiscreteGpu)
+            {
+                // See if it work with the surface
+                size_t queue_count = gpu->get_queue_family_properties().size();
+                for (uint32_t queue_idx = 0; static_cast<size_t>(queue_idx) < queue_count; ++queue_idx)
+                {
+                    if (gpu->get_handle().getSurfaceSupportKHR(queue_idx, surface))
+                    {
+                        return *gpu;
+                    }
+                }
+            }
+        }
+
+        // Otherwise just pick the first one
+        return *gpus[0];
+    }
+
     bool HPPInstance::is_enabled(const char* extension) const
     {
         return std::ranges::find_if(enabled_extensions,
                                     [extension](const char* enabled_extension) {return strcmp(extension, enabled_extension) == 0; }) != enabled_extensions.end();
+    }
+
+    void HPPInstance::query_gpus()
+    {
+        // Querying valid physical devices on the machine
+        auto physical_devices = handle.enumeratePhysicalDevices();
+        if (physical_devices.empty())
+        {
+            throw std::runtime_error("Couldn't find a physical device that supports Vulkan.");
+        }
+
+        // Create gpus wrapper objects from the vk::PhysicalDevice's
+        for (auto& physical_device : physical_devices)
+        {
+            gpus.emplace_back(std::make_unique<HPPPhysicalDevice>(*this, physical_device));
+        }
     }
 }
