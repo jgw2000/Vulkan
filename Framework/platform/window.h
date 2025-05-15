@@ -16,7 +16,6 @@ namespace vkb
 
         enum class Mode
         {
-            Headless,
             Fullscreen,
             FullscreenBorderless,
             FullscreenStretch,
@@ -46,6 +45,8 @@ namespace vkb
         Window(const Properties& properties);
 
         virtual ~Window() = default;
+
+        virtual VkSurfaceKHR create_surface(VkInstance instance) = 0;
 
         /**
         * @brief Checks if the window should be closed
