@@ -15,6 +15,8 @@ namespace vkb
         GlfwWindow(const Window::Properties& properties);
         virtual ~GlfwWindow();
 
+        VkSurfaceKHR create_surface(VkInstance instance) override;
+
         bool should_close() override;
 
         void process_events() override;
