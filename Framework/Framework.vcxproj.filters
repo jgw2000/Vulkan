@@ -7,6 +7,9 @@
     <Filter Include="core">
       <UniqueIdentifier>{2be42d33-8b67-4d69-95b8-ef1ee7f85eab}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rendering">
+      <UniqueIdentifier>{7f344359-ce2d-46cf-b595-e72759842c53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform\application.h">
@@ -35,6 +38,12 @@
     <ClInclude Include="core\hpp_queue.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="rendering\hpp_render_context.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hpp_swapchain.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -61,6 +70,12 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="core\hpp_queue.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\hpp_render_context.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_swapchain.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>

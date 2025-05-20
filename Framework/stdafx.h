@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <optional>
 
@@ -17,3 +18,6 @@
 #include "core/hpp_physical_device.h"
 #include "core/hpp_queue.h"
 #include "core/hpp_device.h"
+#include "core/hpp_swapchain.h"
+
+#include "rendering/hpp_render_context.h"

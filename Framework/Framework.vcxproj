@@ -23,10 +23,12 @@
     <ClInclude Include="core\hpp_instance.h" />
     <ClInclude Include="core\hpp_physical_device.h" />
     <ClInclude Include="core\hpp_queue.h" />
+    <ClInclude Include="core\hpp_swapchain.h" />
     <ClInclude Include="core\vulkan_resource.h" />
     <ClInclude Include="platform\application.h" />
     <ClInclude Include="platform\glfw_window.h" />
     <ClInclude Include="platform\window.h" />
+    <ClInclude Include="rendering\hpp_render_context.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="vulkan_sample.h" />
   </ItemGroup>
@@ -35,10 +37,12 @@
     <ClCompile Include="core\hpp_instance.cpp" />
     <ClCompile Include="core\hpp_physical_device.cpp" />
     <ClCompile Include="core\hpp_queue.cpp" />
+    <ClCompile Include="core\hpp_swapchain.cpp" />
     <ClCompile Include="core\vulkan_resource.cpp" />
     <ClCompile Include="platform\application.cpp" />
     <ClCompile Include="platform\glfw_window.cpp" />
     <ClCompile Include="platform\window.cpp" />
+    <ClCompile Include="rendering\hpp_render_context.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="vulkan_sample.cpp" />
   </ItemGroup>
