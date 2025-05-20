@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "vulkan_sample.h"
-#include "core/hpp_instance.h"
-#include "core/hpp_physical_device.h"
 
 namespace vkb
 {
@@ -12,6 +10,8 @@ namespace vkb
 
     VulkanSample::~VulkanSample()
     {
+        device.reset();
+
         if (surface)
         {
             instance->get_handle().destroySurfaceKHR(surface);
@@ -79,6 +79,9 @@ namespace vkb
         add_device_extension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
         // 3. Creating the logical device
+        device = create_device(gpu);
+
+        // TODO
 
         return true;
     }
@@ -108,6 +111,11 @@ namespace vkb
         return std::make_unique<core::HPPInstance>(get_name(), get_instance_extensions(), get_instance_layers(), get_layer_settings(), api_version);
     }
 
+    std::unique_ptr<core::HPPDevice> VulkanSample::create_device(core::HPPPhysicalDevice& gpu)
+    {
+        return std::make_unique<core::HPPDevice>(gpu, surface, get_device_extensions());
+    }
+
     void VulkanSample::add_device_extension(const char* extension)
     {
         device_extensions.emplace_back(extension);
@@ -126,16 +134,6 @@ namespace vkb
     void VulkanSample::add_layer_setting(const vk::LayerSettingEXT& layerSetting)
     {
         layer_settings.emplace_back(layerSetting);
-    }
-
-    core::HPPInstance& VulkanSample::get_instance()
-    {
-        return *instance;
-    }
-
-    const core::HPPInstance& VulkanSample::get_instance() const
-    {
-        return *instance;
     }
 
     const std::vector<const char*>& VulkanSample::get_device_extensions() const
