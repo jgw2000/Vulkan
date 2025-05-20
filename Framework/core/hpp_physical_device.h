@@ -1,7 +1,5 @@
 #pragma once
 
-#include "hpp_instance.h"
-
 namespace vkb::core
 {
     class HPPInstance;
