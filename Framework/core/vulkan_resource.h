@@ -33,4 +33,26 @@ namespace vkb::core
         HPPDevice*  device;
         Handle      handle;
     };
+
+    template <typename Handle>
+    VulkanResource<Handle>::VulkanResource(Handle handle_, HPPDevice* device_) :
+        handle{ handle_ },
+        device{ device_ }
+    {
+    }
+
+    template <typename Handle>
+    VulkanResource<Handle>::VulkanResource(VulkanResource&& other) :
+        handle(std::exchange(other.handle, {})),
+        device(std::exchange(other.device, {}))
+    {
+    }
+
+    template <typename Handle>
+    VulkanResource<Handle>& VulkanResource<Handle>::operator=(VulkanResource&& other)
+    {
+        handle = std::exchange(other.handle, {});
+        device = std::exchange(other.device, {});
+        return *this;
+    }
 }
