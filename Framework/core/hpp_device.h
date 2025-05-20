@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core/vulkan_resource.h"
-
 namespace vkb::core
 {
     class HPPPhysicalDevice;
@@ -18,17 +16,20 @@ namespace vkb::core
         HPPDevice(HPPPhysicalDevice&        gpu,
                   vk::SurfaceKHR            surface,
                   std::vector<const char*>  requested_extensions = {});
-        ~HPPDevice() {}
+        ~HPPDevice();
 
         HPPDevice(const HPPDevice&) = delete;
         HPPDevice(HPPDevice&&) = delete;
         HPPDevice& operator=(const HPPDevice&) = delete;
         HPPDevice& operator=(HPPDevice&&) = delete;
 
-        //const HPPPhysicalDevice& get_gpu() const;
+        const HPPPhysicalDevice& get_gpu() const { return gpu; }
 
-        //bool is_extension_supported(const std::string& extension) const;
-        //bool is_enabled(const std::string& extension) const;
+        bool is_extension_supported(const std::string& extension) const;
+        
+        bool is_enabled(const std::string& extension) const;
+
+        uint32_t get_queue_family_index(vk::QueueFlagBits queue_flag) const;
 
     private:
         const HPPPhysicalDevice& gpu;
@@ -36,5 +37,7 @@ namespace vkb::core
         vk::SurfaceKHR surface{ nullptr };
 
         std::vector<const char*> enabled_extensions{};
+
+        std::vector<std::vector<HPPQueue>> queues;
     };
 }
