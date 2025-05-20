@@ -77,6 +77,7 @@ namespace vkb
     {
         class HPPInstance;
         class HPPPhysicalDevice;
+        class HPPDevice;
     }
 
     class VulkanSample : public vkb::Application
@@ -131,6 +132,12 @@ namespace vkb
         virtual std::unique_ptr<core::HPPInstance> create_instance();
 
         /**
+         * @brief Create the Vulkan device used by this sample
+         * @note Can be overridden to implement custom device creation
+         */
+        virtual std::unique_ptr<core::HPPDevice> create_device(core::HPPPhysicalDevice& gpu);
+
+        /**
          * @brief Add a sample-specific device extension
          * @param extension The extension name
          * @param optional (Optional) Whether the extension is optional
@@ -155,8 +162,10 @@ namespace vkb
          */
         void add_layer_setting(const vk::LayerSettingEXT& layerSetting);
 
-        core::HPPInstance& get_instance();
-        const core::HPPInstance& get_instance() const;
+        core::HPPInstance&       get_instance()       { return *instance; }
+        const core::HPPInstance& get_instance() const { return *instance; }
+        core::HPPDevice&         get_device()         { return *device; }
+        const core::HPPDevice&   get_device() const   { return *device; }
 
         /// <summary>
         /// PRIVATE INTERFACE
@@ -198,6 +207,11 @@ namespace vkb
          * @brief The Vulkan instance
          */
         std::unique_ptr<core::HPPInstance> instance;
+
+        /**
+         * @brief The Vulkan device
+         */
+        std::unique_ptr<core::HPPDevice> device;
 
         /**
          * @brief The Vulkan surface
