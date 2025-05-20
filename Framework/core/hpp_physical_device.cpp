@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "hpp_physical_device.h"
 
 namespace vkb::core
 {
