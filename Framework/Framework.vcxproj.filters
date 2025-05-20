@@ -32,6 +32,9 @@
     <ClInclude Include="core\vulkan_resource.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="core\hpp_queue.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -55,6 +58,9 @@
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="core\vulkan_resource.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_queue.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
