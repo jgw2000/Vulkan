@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "hpp_instance.h"
-#include "hpp_physical_device.h"
 
 #if defined(_DEBUG)
 #   define USE_VALIDATION_LAYERS
