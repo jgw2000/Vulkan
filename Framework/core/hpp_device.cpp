@@ -75,7 +75,11 @@ namespace vkb::core
         // Check that extensions are supported before trying to create the device
         for (auto& extension : requested_extensions)
         {
-            if (!is_extension_supported(extension))
+            if (is_extension_supported(extension))
+            {
+                enabled_extensions.emplace_back(extension);
+            }
+            else
             {
                 throw std::runtime_error("Device extension not present");
             }
@@ -111,6 +115,8 @@ namespace vkb::core
             }
         }
 
+        VULKAN_HPP_DEFAULT_DISPATCHER.init(get_handle());
+
         // TODO
     }
 
@@ -120,6 +126,61 @@ namespace vkb::core
         {
             get_handle().destroy();
         }
+    }
+
+    const HPPQueue& HPPDevice::get_queue(uint32_t queue_family_index, uint32_t queue_index) const
+    {
+        return queues[queue_family_index][queue_index];
+    }
+
+    const HPPQueue& HPPDevice::get_queue_by_flags(vk::QueueFlags required_queue_flags, uint32_t queue_index) const
+    {
+        for (size_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index)
+        {
+            const auto& first_queue = queues[queue_family_index][0];
+
+            vk::QueueFlags queue_flags = first_queue.get_properties().queueFlags;
+            uint32_t       queue_count = first_queue.get_properties().queueCount;
+
+            if (((queue_flags & required_queue_flags) == required_queue_flags) && queue_index < queue_count)
+            {
+                return queues[queue_family_index][queue_index];
+            }
+        }
+
+        throw std::runtime_error("Queue not found");
+    }
+
+    const HPPQueue& HPPDevice::get_queue_by_present(uint32_t queue_index) const
+    {
+        for (size_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index)
+        {
+            const auto& first_queue = queues[queue_family_index][0];
+            uint32_t queue_count = first_queue.get_properties().queueCount;
+
+            if (first_queue.support_present() && queue_index < queue_count)
+            {
+                return queues[queue_family_index][queue_index];
+            }
+        }
+
+        throw std::runtime_error("Queue not found");
+    }
+
+    const HPPQueue& HPPDevice::get_suitable_graphics_queue() const
+    {
+        for (size_t queue_family_index = 0U; queue_family_index < queues.size(); ++queue_family_index)
+        {
+            const auto& first_queue = queues[queue_family_index][0];
+            uint32_t queue_count = first_queue.get_properties().queueCount;
+
+            if (first_queue.support_present() && 0 < queue_count)
+            {
+                return queues[queue_family_index][0];
+            }
+        }
+
+        return get_queue_by_flags(vk::QueueFlagBits::eGraphics, 0);
     }
 
     bool HPPDevice::is_extension_supported(const std::string& requested_extension) const
