@@ -80,6 +80,11 @@ namespace vkb
         class HPPDevice;
     }
 
+    namespace rendering
+    {
+        class HPPRenderContext;
+    }
+
     class VulkanSample : public vkb::Application
     {
         /// <summary>
@@ -138,6 +143,16 @@ namespace vkb
         virtual std::unique_ptr<core::HPPDevice> create_device(core::HPPPhysicalDevice& gpu);
 
         /**
+         * @brief Override this to customise the creation of the render_context
+         */
+        virtual void create_render_context();
+
+        /**
+         * @brief Override this to customise the creation of the swapchain and render_context
+         */
+        virtual void prepare_render_context();
+
+        /**
          * @brief Add a sample-specific device extension
          * @param extension The extension name
          * @param optional (Optional) Whether the extension is optional
@@ -162,15 +177,24 @@ namespace vkb
          */
         void add_layer_setting(const vk::LayerSettingEXT& layerSetting);
 
-        core::HPPInstance&       get_instance()       { return *instance; }
-        const core::HPPInstance& get_instance() const { return *instance; }
-        core::HPPDevice&         get_device()         { return *device; }
-        const core::HPPDevice&   get_device() const   { return *device; }
+        /**
+         * @brief A helper to create a render context
+         */
+        void create_render_context(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list);
+
+        core::HPPInstance&                 get_instance()             { return *instance; }
+        const core::HPPInstance&           get_instance() const       { return *instance; }
+        core::HPPDevice&                   get_device()               { return *device; }
+        const core::HPPDevice&             get_device() const         { return *device; }
+        rendering::HPPRenderContext&       get_render_context()       { return *render_context; }
+        const rendering::HPPRenderContext& get_render_context() const { return *render_context; }
 
         /// <summary>
         /// PRIVATE INTERFACE
         /// </summary>
     private:
+        void create_render_context_impl(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list);
+
         /**
          * @brief Get sample-specific device extensions.
          *
@@ -214,9 +238,22 @@ namespace vkb
         std::unique_ptr<core::HPPDevice> device;
 
         /**
+         * @brief Context used for rendering, it is responsible for managing the frames and their underlying images
+         */
+        std::unique_ptr<rendering::HPPRenderContext> render_context;
+
+        /**
          * @brief The Vulkan surface
          */
         vk::SurfaceKHR surface;
+
+        /**
+         * @brief A list of surface formats in order of priority (vector[0] has high priority, vector[size-1] has low priority)
+         */
+        std::vector<vk::SurfaceFormatKHR> surface_priority_list = {
+            { vk::Format::eR8G8B8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear },
+            { vk::Format::eB8G8R8A8Srgb, vk::ColorSpaceKHR::eSrgbNonlinear },
+        };
 
         /** @brief Vector of device extensions to be enabled for this example(must be set in the derived constructor) */
         std::vector<const char*> device_extensions;
