@@ -13,6 +13,8 @@
 #include <Volk/volk.h>
 #include <vulkan/vulkan.hpp>
 
+#include "platform/window.h"
+
 #include "core/vulkan_resource.h"
 #include "core/hpp_instance.h"
 #include "core/hpp_physical_device.h"
