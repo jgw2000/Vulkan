@@ -44,6 +44,12 @@
     <ClInclude Include="core\hpp_swapchain.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="rendering\hpp_render_frame.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering\hpp_render_target.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -77,6 +83,12 @@
     </ClCompile>
     <ClCompile Include="core\hpp_swapchain.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\hpp_render_frame.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\hpp_render_target.cpp">
+      <Filter>rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
