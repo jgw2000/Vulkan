@@ -78,8 +78,12 @@ namespace vkb
         // Creating vulkan device, specifying the swapchain extension always
         add_device_extension(VK_KHR_SWAPCHAIN_EXTENSION_NAME);
 
-        // 3. Creating the logical device
+        // 3. Create logical device
         device = create_device(gpu);
+
+        // 4. Create swapchain and render context
+        create_render_context();
+        prepare_render_context();
 
         // TODO
 
@@ -116,6 +120,16 @@ namespace vkb
         return std::make_unique<core::HPPDevice>(gpu, surface, get_device_extensions());
     }
 
+    void VulkanSample::create_render_context()
+    {
+        create_render_context_impl(surface_priority_list);
+    }
+
+    void VulkanSample::prepare_render_context()
+    {
+
+    }
+
     void VulkanSample::add_device_extension(const char* extension)
     {
         device_extensions.emplace_back(extension);
@@ -136,6 +150,11 @@ namespace vkb
         layer_settings.emplace_back(layerSetting);
     }
 
+    void VulkanSample::create_render_context(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list)
+    {
+        create_render_context_impl(surface_priority_list);
+    }
+
     const std::vector<const char*>& VulkanSample::get_device_extensions() const
     {
         return device_extensions;
@@ -154,5 +173,11 @@ namespace vkb
     const std::vector<vk::LayerSettingEXT>& VulkanSample::get_layer_settings() const
     {
         return layer_settings;
+    }
+
+    void VulkanSample::create_render_context_impl(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list)
+    {
+        auto present_mode               = (window->get_properties().vsync == Window::Vsync::ON) ? vk::PresentModeKHR::eFifo : vk::PresentModeKHR::eMailbox;
+        auto present_mode_priority_list = { vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate, vk::PresentModeKHR::eMailbox };
     }
 }
