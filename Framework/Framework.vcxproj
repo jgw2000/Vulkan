@@ -19,7 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="core\allocated.h" />
     <ClInclude Include="core\hpp_device.h" />
+    <ClInclude Include="core\hpp_image.h" />
+    <ClInclude Include="core\hpp_image_view.h" />
     <ClInclude Include="core\hpp_instance.h" />
     <ClInclude Include="core\hpp_physical_device.h" />
     <ClInclude Include="core\hpp_queue.h" />
@@ -35,7 +38,10 @@
     <ClInclude Include="vulkan_sample.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="core\allocated.cpp" />
     <ClCompile Include="core\hpp_device.cpp" />
+    <ClCompile Include="core\hpp_image.cpp" />
+    <ClCompile Include="core\hpp_image_view.cpp" />
     <ClCompile Include="core\hpp_instance.cpp" />
     <ClCompile Include="core\hpp_physical_device.cpp" />
     <ClCompile Include="core\hpp_queue.cpp" />

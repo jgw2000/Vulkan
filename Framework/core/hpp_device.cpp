@@ -117,11 +117,15 @@ namespace vkb::core
 
         VULKAN_HPP_DEFAULT_DISPATCHER.init(get_handle());
 
+        vkb::allocated::init(*this);
+
         // TODO
     }
 
     HPPDevice::~HPPDevice()
     {
+        vkb::allocated::shutdown();
+
         if (get_handle())
         {
             get_handle().destroy();

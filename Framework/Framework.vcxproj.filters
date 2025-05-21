@@ -50,6 +50,15 @@
     <ClInclude Include="rendering\hpp_render_target.h">
       <Filter>rendering</Filter>
     </ClInclude>
+    <ClInclude Include="core\allocated.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hpp_image.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hpp_image_view.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -89,6 +98,15 @@
     </ClCompile>
     <ClCompile Include="rendering\hpp_render_target.cpp">
       <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="core\allocated.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_image.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_image_view.cpp">
+      <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

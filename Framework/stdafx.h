@@ -12,15 +12,19 @@
 
 #include <Volk/volk.h>
 #include <vulkan/vulkan.hpp>
+#include <vma/vk_mem_alloc.h>
 
 #include "platform/window.h"
 
+#include "core/allocated.h"
 #include "core/vulkan_resource.h"
 #include "core/hpp_instance.h"
 #include "core/hpp_physical_device.h"
 #include "core/hpp_queue.h"
 #include "core/hpp_device.h"
 #include "core/hpp_swapchain.h"
+#include "core/hpp_image.h"
+#include "core/hpp_image_view.h"
 
 #include "rendering/hpp_render_context.h"
 #include "rendering/hpp_render_frame.h"
