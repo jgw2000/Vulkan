@@ -23,3 +23,5 @@
 #include "core/hpp_swapchain.h"
 
 #include "rendering/hpp_render_context.h"
+#include "rendering/hpp_render_frame.h"
+#include "rendering/hpp_render_target.h"
