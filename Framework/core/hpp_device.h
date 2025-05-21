@@ -25,6 +25,18 @@ namespace vkb::core
 
         const HPPPhysicalDevice& get_gpu() const { return gpu; }
 
+        const HPPQueue& get_queue(uint32_t queue_family_index, uint32_t queue_index) const;
+
+        const HPPQueue& get_queue_by_flags(vk::QueueFlags queue_flags, uint32_t queue_index) const;
+
+        const HPPQueue& get_queue_by_present(uint32_t queue_index) const;
+
+        /**
+         * @brief Finds a suitable graphics queue to submit to
+         * @return The first present supported queue, otherwise just any graphics queue
+         */
+        const HPPQueue& get_suitable_graphics_queue() const;
+
         bool is_extension_supported(const std::string& extension) const;
         
         bool is_enabled(const std::string& extension) const;
