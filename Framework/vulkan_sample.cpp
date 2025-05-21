@@ -10,6 +10,12 @@ namespace vkb
 
     VulkanSample::~VulkanSample()
     {
+        if (device)
+        {
+            device->get_handle().waitIdle();
+        }
+
+        render_context.reset();
         device.reset();
 
         if (surface)
@@ -179,5 +185,8 @@ namespace vkb
     {
         auto present_mode               = (window->get_properties().vsync == Window::Vsync::ON) ? vk::PresentModeKHR::eFifo : vk::PresentModeKHR::eMailbox;
         auto present_mode_priority_list = { vk::PresentModeKHR::eFifo, vk::PresentModeKHR::eImmediate, vk::PresentModeKHR::eMailbox };
+    
+        render_context =
+            std::make_unique<vkb::rendering::HPPRenderContext>(*device, surface, *window, present_mode, present_mode_priority_list, surface_priority_list);
     }
 }
