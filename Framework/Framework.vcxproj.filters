@@ -59,6 +59,7 @@
     <ClInclude Include="core\hpp_image_view.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="builder_base.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">

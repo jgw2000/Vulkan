@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="builder_base.h" />
     <ClInclude Include="core\allocated.h" />
     <ClInclude Include="core\hpp_device.h" />
     <ClInclude Include="core\hpp_image.h" />

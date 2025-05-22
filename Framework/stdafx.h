@@ -8,11 +8,12 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <unordered_set>
 #include <optional>
 
 #include <Volk/volk.h>
-#include <vulkan/vulkan.hpp>
 #include <vma/vk_mem_alloc.h>
+#include <vulkan/vulkan_format_traits.hpp>
 
 #include "platform/window.h"
 
