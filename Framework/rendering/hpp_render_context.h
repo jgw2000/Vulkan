@@ -58,5 +58,19 @@ namespace vkb::rendering
         std::unique_ptr<vkb::core::HPPSwapchain> swapchain;
 
         vkb::core::HPPSwapchainProperties swapchain_properties;
+
+        bool prepared{ false };
+
+        // Current active frame index
+        uint32_t active_frame_index{ 0 };
+
+        // Whether a frame is active or not
+        bool frame_active{ false };
+
+        HPPRenderTarget::CreateFunc create_render_target_func = HPPRenderTarget::DEFAULT_CREATE_FUNC;
+
+        vk::SurfaceTransformFlagBitsKHR pre_transform{ vk::SurfaceTransformFlagBitsKHR::eIdentity };
+
+        size_t thread_count{ 1 };
     };
 }

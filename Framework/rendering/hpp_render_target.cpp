@@ -23,7 +23,31 @@ namespace vkb::rendering
     {
         assert(!images.empty() && "Should specify at least 1 image");
 
-        // TODO
+        // check that every image is 2D
+        auto it = std::ranges::find_if(images, [](const core::HPPImage& image) {
+            return image.get_type() != vk::ImageType::e2D;
+        });
+        if (it != images.end())
+        {
+            throw std::runtime_error("Image type is not 2D");
+        }
+
+        extent.width  = images.front().get_extent().width;
+        extent.height = images.front().get_extent().height;
+
+        // check that every image has the same extent
+        it = std::find_if(std::next(images.begin()), images.end(),
+            [this](const core::HPPImage& image) { return (extent.width != image.get_extent().width) || (extent.height != image.get_extent().height); });
+        if (it != images.end())
+        {
+            throw std::runtime_error("Extent size is not same");
+        }
+
+        for (auto& image : images)
+        {
+            views.emplace_back(image, vk::ImageViewType::e2D);
+            // TODO
+        }
     }
 
     HPPRenderTarget::HPPRenderTarget(std::vector<core::HPPImageView>&& image_views) :
@@ -32,6 +56,26 @@ namespace vkb::rendering
     {
         assert(!views.empty() && "Should specify at least 1 image view");
 
-        // TODO
+        uint32_t mip_level = views.front().get_subresource_range().baseMipLevel;
+        extent.width       = views.front().get_image().get_extent().width >> mip_level;
+        extent.height      = views.front().get_image().get_extent().height >> mip_level;
+
+        // check that every image view has the same extent
+        auto it = std::find_if(std::next(views.begin()), views.end(),
+            [this](const core::HPPImageView& image_view) {
+                const uint32_t mip_level = image_view.get_subresource_range().baseMipLevel;
+                return (extent.width != image_view.get_image().get_extent().width >> mip_level) ||
+                       (extent.height != image_view.get_image().get_extent().height >> mip_level);
+            });
+        if (it != views.end())
+        {
+            throw std::runtime_error("Extent size is not same");
+        }
+
+        for (auto& view : views)
+        {
+            const auto& image = view.get_image();
+            // TODO
+        }
     }
 }

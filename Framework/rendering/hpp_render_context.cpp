@@ -45,5 +45,25 @@ namespace vkb::rendering
                 // TODO
             }
         }
+        else
+        {
+            // Otherwise, create a single RenderFrame
+            swapchain = nullptr;
+
+            auto color_image = vkb::core::HPPImage{
+                device,
+                vk::Extent3D{surface_extent.width, surface_extent.height, 1},
+                DEFAULT_VK_FORMAT,      // We can use any format here that we like
+                vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eTransferSrc,
+                VMA_MEMORY_USAGE_GPU_ONLY
+            };
+
+            auto render_target = create_render_target_func(std::move(color_image));
+            // TODO
+        }
+
+        this->create_render_target_func = create_render_target_func;
+        this->thread_count              = thread_count;
+        this->prepared                  = true;
     }
 }
