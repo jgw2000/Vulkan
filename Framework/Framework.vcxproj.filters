@@ -10,6 +10,9 @@
     <Filter Include="rendering">
       <UniqueIdentifier>{7f344359-ce2d-46cf-b595-e72759842c53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{dd012ddf-a1bd-4d6e-b6d9-4a130eee1228}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform\application.h">
@@ -60,6 +63,9 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="builder_base.h" />
+    <ClInclude Include="common\vk_common.h">
+      <Filter>common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -109,5 +115,9 @@
     <ClCompile Include="core\hpp_image_view.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="common\vk_common.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="builder_base.cpp" />
   </ItemGroup>
 </Project>

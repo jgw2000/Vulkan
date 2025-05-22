@@ -133,7 +133,7 @@ namespace vkb
 
     void VulkanSample::prepare_render_context()
     {
-
+        render_context->prepare();
     }
 
     void VulkanSample::add_device_extension(const char* extension)

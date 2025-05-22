@@ -86,6 +86,72 @@ namespace vkb::allocated
     public:
         const HandleType* get() const { return &ParentType::get_handle(); }
 
+        /**
+         * @brief Retrieves a pointer to the host visible memory as an unsigned byte array.
+         * @return The pointer to the host visible memory.
+         * @note This performs no checking that the memory is actually mapped, so it's possible to get a nullptr
+         */
+        const uint8_t* get_data() const { return mapped_data; }
+
+        /**
+         * @brief Retrieves the raw Vulkan memory object.
+         * @return The Vulkan memory object.
+         */
+        vk::DeviceMemory get_memory() const;
+
+        /**
+         * @brief Maps Vulkan memory if it isn't already mapped to a host visible address. Does nothing if the
+         * allocation is already mapped (including persistently mapped allocations).
+         * @return Pointer to host visible memory.
+         */
+        uint8_t* map();
+
+        /**
+         * @brief Returns true if the memory is mapped (i.e. the object contains a pointer for the mapping).
+         * This is true for both objects where `map` has been called as well as objects created with persistent
+         * mapping, where no call to `map` is necessary.
+         * @return mapping status.
+         */
+        bool mapped() const { return mapped_data != nullptr; }
+
+        /**
+         * @brief Unmaps Vulkan memory from the host visible address.  Does nothing if the memory is not mapped or
+         * if the allocation is persistently mapped.
+         */
+        void unmap();
+
+    protected:
+        /**
+         * @brief Internal method to actually create the image, allocate the memory and bind them.
+         * Should only be called from the `Image` derived class.
+         *
+         * Present in this common base class in order to allow the internal state members to remain `private`
+         * instead of `protected`, and because it (mostly) isolates interaction with the VMA to a single class
+         */
+        [[nodiscard]] vk::Image create_image(const vk::ImageCreateInfo& create_info);
+
+        /**
+         * @brief The post_create method is called after the creation of a buffer or image to store the allocation info internally.  Derived classes
+         * could in theory override this to ensure any post-allocation operations are performed, but the base class should always be called to ensure
+         * the allocation info is stored.
+         * Should only be called in the corresponding `create_xxx` methods.
+         */
+        virtual void post_create(const VmaAllocationInfo& allocation_info);
+
+        /**
+         * @brief Internal method to actually destroy the image and release the allocated memory.  Should
+         * only be called from the `Image` derived class.
+         * Present in this common base class in order to allow the internal state members to remain `private`
+         * instead of `protected`, and because it (mostly) isolates interaction with the VMA to a single class
+         */
+        void destroy_image(vk::Image image);
+
+        /**
+         * @brief Clears the internal state.  Can be overridden by derived classes to perform additional cleanup of members.
+         * Should only be called in the corresping `destroy_xxx` methods.
+         */
+        virtual void clear();
+
     private:
         VmaAllocationCreateInfo allocation_create_info = {};
         VmaAllocation           allocation             = VK_NULL_HANDLE;
@@ -135,4 +201,101 @@ namespace vkb::allocated
     inline Allocated<HandleType>::Allocated(HandleType handle, DeviceType* device_) :
         ParentType(handle, device_)
     { }
+
+    template <typename HandleType>
+    inline vk::DeviceMemory Allocated<HandleType>::get_memory() const
+    {
+        VmaAllocationInfo alloc_info;
+        vmaGetAllocationInfo(get_memory_allocator(), allocation, &alloc_info);
+        return static_cast<vk::DeviceMemory>(alloc_info.deviceMemory);
+    }
+
+    template <typename HandleType>
+    inline uint8_t* Allocated<HandleType>::map()
+    {
+        if (!persistent && !mapped())
+        {
+            vmaMapMemory(get_memory_allocator(), allocation, reinterpret_cast<void**>(&mapped_data));
+            assert(mapped_data);
+        }
+        return mapped_data;
+    }
+
+    template <typename HandleType>
+    inline void Allocated<HandleType>::unmap()
+    {
+        if (!persistent && mapped())
+        {
+            vmaUnmapMemory(get_memory_allocator(), allocation);
+            mapped_data = nullptr;
+        }
+    }
+
+    template <typename HandleType>
+    inline vk::Image Allocated<HandleType>::create_image(const vk::ImageCreateInfo& create_info)
+    {
+        assert(0 < create_info.mipLevels && "Images should have at least one level");
+        assert(0 < create_info.arrayLayers && "Images should have at least one layer");
+        assert(create_info.usage && "Images should have at least one usage type");
+
+        vk::Image         image = VK_NULL_HANDLE;
+        VmaAllocationInfo allocation_info{};
+
+#if 0
+        // If the image is an attachment, prefer dedicated memory
+        constexpr vk::ImageUsageFlags attachment_only_flags = vk::ImageUsageFlagBits::eColorAttachment | vk::ImageUsageFlagBits::eDepthStencilAttachment | vk::ImageUsageFlagBits::eTransientAttachment;
+        if (create_info.usage & attachment_only_flags)
+        {
+            allocation_create_info.flags |= VMA_ALLOCATION_CREATE_DEDICATED_MEMORY_BIT;
+        }
+
+        if (create_info.usage & vk::ImageUsageFlagBits::eTransientAttachment)
+        {
+            allocation_create_info.preferredFlags |= VK_MEMORY_PROPERTY_LAZILY_ALLOCATED_BIT;
+        }
+#endif
+
+        VkResult result = vmaCreateImage(get_memory_allocator(),
+                                         reinterpret_cast<const VkImageCreateInfo*>(&create_info),
+                                         &allocation_create_info,
+                                         reinterpret_cast<VkImage*>(&image),
+                                         &allocation,
+                                         &allocation_info);
+        if (result != VK_SUCCESS)
+        {
+            throw std::runtime_error("Cannot create Image");
+        }
+
+        post_create(allocation_info);
+        return image;
+    }
+
+    template <typename HandleType>
+    inline void Allocated<HandleType>::post_create(const VmaAllocationInfo& allocation_info)
+    {
+        VkMemoryPropertyFlags memory_properties;
+        vmaGetAllocationMemoryProperties(get_memory_allocator(), allocation, &memory_properties);
+        coherent    = (memory_properties & VK_MEMORY_PROPERTY_HOST_COHERENT_BIT) == VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
+        mapped_data = static_cast<uint8_t*>(allocation_info.pMappedData);
+        persistent  = mapped();
+    }
+
+    template <typename HandleType>
+    inline void Allocated<HandleType>::destroy_image(vk::Image image)
+    {
+        if (image != VK_NULL_HANDLE && allocation != VK_NULL_HANDLE)
+        {
+            unmap();
+            vmaDestroyImage(get_memory_allocator(), static_cast<VkImage>(image), allocation);
+            clear();
+        }
+    }
+
+    template <typename HandleType>
+    inline void Allocated<HandleType>::clear()
+    {
+        mapped_data            = nullptr;
+        persistent             = false;
+        allocation_create_info = {};
+    }
 }

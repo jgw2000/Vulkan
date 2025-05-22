@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="builder_base.h" />
+    <ClInclude Include="common\vk_common.h" />
     <ClInclude Include="core\allocated.h" />
     <ClInclude Include="core\hpp_device.h" />
     <ClInclude Include="core\hpp_image.h" />
@@ -39,6 +40,8 @@
     <ClInclude Include="vulkan_sample.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="builder_base.cpp" />
+    <ClCompile Include="common\vk_common.cpp" />
     <ClCompile Include="core\allocated.cpp" />
     <ClCompile Include="core\hpp_device.cpp" />
     <ClCompile Include="core\hpp_image.cpp" />

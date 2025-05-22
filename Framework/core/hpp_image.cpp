@@ -25,6 +25,16 @@ namespace vkb
 
 namespace vkb::core
 {
+    HPPImage HPPImageBuilder::build(HPPDevice& device) const
+    {
+        return HPPImage(device, *this);
+    }
+
+    HPPImagePtr HPPImageBuilder::build_unique(HPPDevice& device) const
+    {
+        return std::make_unique<HPPImage>(device, *this);
+    }
+
     HPPImage::HPPImage(HPPDevice&              device,
                        vk::Image               handle,
                        const vk::Extent3D&     extent,
@@ -43,9 +53,41 @@ namespace vkb::core
         subresource.arrayLayer  = 1;
     }
 
+    HPPImage::HPPImage(HPPDevice& device,
+                       const vk::Extent3D&     extent,
+                       vk::Format              format,
+                       vk::ImageUsageFlags     image_usage,
+                       VmaMemoryUsage          memory_usage,
+                       vk::SampleCountFlagBits sample_count,
+                       uint32_t                mip_levels,
+                       uint32_t                array_layers,
+                       vk::ImageTiling         tiling,
+                       vk::ImageCreateFlags    flags,
+                       uint32_t                num_queue_families,
+                       const uint32_t*         queue_families) :
+        HPPImage{device,
+                 HPPImageBuilder{extent}
+                     .with_format(format)
+                     .with_mip_levels(mip_levels)
+                     .with_array_layers(array_layers)
+                     .with_sample_count(sample_count)
+                     .with_tiling(tiling)
+                     .with_flags(flags)
+                     .with_usage(image_usage)
+                     .with_queue_families(num_queue_families, queue_families)}
+    { }
+
+    HPPImage::HPPImage(HPPDevice& device, const HPPImageBuilder& builder):
+        vkb::allocated::Allocated<vk::Image>{ builder.get_allocation_create_info(), nullptr, &device }, create_info{ builder.get_create_info() }
+    {
+        get_handle() = create_image(create_info);
+        subresource.arrayLayer = create_info.arrayLayers;
+        subresource.mipLevel = create_info.mipLevels;
+    }
+
     HPPImage::~HPPImage()
     {
-        // TODO
+        destroy_image(get_handle());
     }
 
     HPPImage::HPPImage(HPPImage&& other) noexcept :
@@ -59,5 +101,10 @@ namespace vkb::core
         {
             view->set_image(*this);
         }
+    }
+
+    uint8_t* HPPImage::map()
+    {
+        return vkb::allocated::Allocated<vk::Image>::map();
     }
 }

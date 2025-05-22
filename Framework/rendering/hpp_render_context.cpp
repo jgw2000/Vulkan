@@ -27,4 +27,23 @@ namespace vkb::rendering
             }
         }
     }
+
+    void HPPRenderContext::prepare(size_t thread_count, HPPRenderTarget::CreateFunc create_render_target_func)
+    {
+        device.get_handle().waitIdle();
+
+        if (swapchain)
+        {
+            surface_extent = swapchain->get_extent();
+
+            vk::Extent3D extent{ surface_extent.width, surface_extent.height, 1 };
+
+            for (auto& image_handle : swapchain->get_images())
+            {
+                auto swapchain_image = core::HPPImage{ device, image_handle, extent, swapchain->get_format(), swapchain->get_usage() };
+                auto render_target = create_render_target_func(std::move(swapchain_image));
+                // TODO
+            }
+        }
+    }
 }

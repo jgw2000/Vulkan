@@ -37,6 +37,13 @@ namespace vkb::rendering
         HPPRenderContext& operator=(const HPPRenderContext&) = delete;
         HPPRenderContext& operator=(HPPRenderContext&&) = delete;
 
+        /**
+         * @brief Prepares the RenderFrames for rendering
+         * @param thread_count The number of threads in the application, necessary to allocate this many resource pools for each RenderFrame
+         * @param create_render_target_func A function delegate, used to create a RenderTarget
+         */
+        void prepare(size_t thread_count = 1, HPPRenderTarget::CreateFunc create_render_target_func = HPPRenderTarget::DEFAULT_CREATE_FUNC);
+
     protected:
         vk::Extent2D surface_extent;
 
