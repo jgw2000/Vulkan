@@ -66,6 +66,9 @@
     <ClInclude Include="common\vk_common.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="core\hpp_render_pass.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -119,5 +122,8 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="builder_base.cpp" />
+    <ClCompile Include="core\hpp_render_pass.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

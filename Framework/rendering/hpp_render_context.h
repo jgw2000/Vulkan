@@ -59,6 +59,8 @@ namespace vkb::rendering
 
         vkb::core::HPPSwapchainProperties swapchain_properties;
 
+        std::vector<std::unique_ptr<HPPRenderFrame>> frames;
+
         bool prepared{ false };
 
         // Current active frame index

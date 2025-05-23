@@ -29,6 +29,7 @@
 #include "core/hpp_swapchain.h"
 #include "core/hpp_image.h"
 #include "core/hpp_image_view.h"
+#include "core/hpp_render_pass.h"
 
 #include "rendering/hpp_render_target.h"
 #include "rendering/hpp_render_frame.h"

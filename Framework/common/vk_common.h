@@ -3,6 +3,12 @@
 
 namespace vkb::common
 {
+    struct HPPLoadStoreInfo
+    {
+        vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eClear;
+        vk::AttachmentStoreOp store_op = vk::AttachmentStoreOp::eStore;
+    };
+
     /**
      * @brief Helper function to determine if a Vulkan format is depth only.
      * @param format Vulkan format to check.

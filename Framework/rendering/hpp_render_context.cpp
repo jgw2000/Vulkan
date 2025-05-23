@@ -42,7 +42,7 @@ namespace vkb::rendering
             {
                 auto swapchain_image = core::HPPImage{ device, image_handle, extent, swapchain->get_format(), swapchain->get_usage() };
                 auto render_target = create_render_target_func(std::move(swapchain_image));
-                // TODO
+                frames.emplace_back(std::make_unique<HPPRenderFrame>(device, std::move(render_target), thread_count));
             }
         }
         else
@@ -59,7 +59,7 @@ namespace vkb::rendering
             };
 
             auto render_target = create_render_target_func(std::move(color_image));
-            // TODO
+            frames.emplace_back(std::make_unique<HPPRenderFrame>(device, std::move(render_target), thread_count));
         }
 
         this->create_render_target_func = create_render_target_func;

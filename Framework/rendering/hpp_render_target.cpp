@@ -46,7 +46,7 @@ namespace vkb::rendering
         for (auto& image : images)
         {
             views.emplace_back(image, vk::ImageViewType::e2D);
-            // TODO
+            attachments.emplace_back(HPPAttachment{ image.get_format(), image.get_sample_count(), image.get_usage() });
         }
     }
 
@@ -75,7 +75,37 @@ namespace vkb::rendering
         for (auto& view : views)
         {
             const auto& image = view.get_image();
-            // TODO
+            attachments.emplace_back(HPPAttachment{ image.get_format(), image.get_sample_count(), image.get_usage() });
         }
+    }
+
+    void HPPRenderTarget::set_input_attachments(std::vector<uint32_t>& input)
+    {
+        input_attachments = input;
+    }
+
+    const std::vector<uint32_t>& HPPRenderTarget::get_input_attachments() const
+    {
+        return input_attachments;
+    }
+
+    void HPPRenderTarget::set_output_attachments(std::vector<uint32_t>& output)
+    {
+        output_attachments = output;
+    }
+
+    const std::vector<uint32_t>& HPPRenderTarget::get_output_attachments() const
+    {
+        return output_attachments;
+    }
+
+    void HPPRenderTarget::set_layout(uint32_t attachment, vk::ImageLayout layout)
+    {
+        attachments[attachment].initial_layout = layout;
+    }
+
+    vk::ImageLayout HPPRenderTarget::get_layout(uint32_t attachment) const
+    {
+        return attachments[attachment].initial_layout;
     }
 }
