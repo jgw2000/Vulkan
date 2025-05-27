@@ -181,6 +181,16 @@ namespace vkb
         return layer_settings;
     }
 
+    void VulkanSample::set_render_context(std::unique_ptr<rendering::HPPRenderContext>&& rc)
+    {
+        render_context.reset(rc.release());
+    }
+
+    void VulkanSample::set_render_pipeline(std::unique_ptr<rendering::HPPRenderPipeline>&& rp)
+    {
+        render_pipeline.reset(rp.release());
+    }
+
     void VulkanSample::create_render_context_impl(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list)
     {
         auto present_mode               = (window->get_properties().vsync == Window::Vsync::ON) ? vk::PresentModeKHR::eFifo : vk::PresentModeKHR::eMailbox;

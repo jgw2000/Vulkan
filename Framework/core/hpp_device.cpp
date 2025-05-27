@@ -6,7 +6,8 @@ namespace vkb::core
                          vk::SurfaceKHR           surface,
                          std::vector<const char*> requested_extensions) :
         VulkanResource{ nullptr, this },
-        gpu{ gpu }
+        gpu{ gpu },
+        resource_cache{ *this }
     {
         // Prepare the device queues
         std::vector<vk::QueueFamilyProperties> queue_family_properties = gpu.get_queue_family_properties();

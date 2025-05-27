@@ -44,6 +44,67 @@ namespace vkb::rendering
          */
         void prepare(size_t thread_count = 1, HPPRenderTarget::CreateFunc create_render_target_func = HPPRenderTarget::DEFAULT_CREATE_FUNC);
 
+        /**
+         * @brief Updates the swapchains extent and surface transform, if a swapchain exists
+         * @param extent The width and height of the new swapchain images
+         * @param transform The surface transform flags
+         */
+        void update_swapchain(const vk::Extent2D& extent, const vk::SurfaceTransformFlagBitsKHR transform);
+
+        /**
+         * @brief Recreate the RenderFrame, called after every update
+         */
+        void recreate();
+
+        /**
+         * @brief Prepares the next available frame for rendering
+         * @param reset_mode How to reset the command buffer
+         * @returns A valid command buffer to record commands to be submitted
+         * Also ensures that there is an active frame if there is no existing active frame already
+         */
+        vkb::core::HPPCommandBuffer& begin(vkb::CommandBufferResetMode reset_mode = vkb::CommandBufferResetMode::ResetPool);
+
+        /**
+         * @brief begin_frame
+         */
+        void begin_frame();
+
+        /**
+         * @brief A frame is active after @ref begin_frame has been called.
+         * @return The current active frame
+         */
+        HPPRenderFrame& get_active_frame() { return *frames[active_frame_index]; }
+
+        /**
+         * @brief A frame is active after @ref begin_frame has been called.
+         * @return The current active frame index
+         */
+        uint32_t get_active_frame_index() { return active_frame_index; }
+
+        /**
+         * @brief A frame is active after @ref begin_frame has been called.
+         * @return The previous frame
+         */
+        HPPRenderFrame& get_last_rendered_frame() { return *frames[active_frame_index]; }
+
+        vkb::core::HPPDevice& get_device() { return device; }
+
+        /**
+         * @brief Returns the format that the RenderTargets are created with the HPPRenderContext
+         */
+        vk::Format get_format() const { return swapchain ? swapchain->get_format() : DEFAULT_VK_FORMAT; }
+
+        const vkb::core::HPPSwapchain& get_swapchain() const { return *swapchain; }
+
+        const vk::Extent2D& get_surface_extent() const { return surface_extent; }
+
+        std::vector<std::unique_ptr<HPPRenderFrame>>& get_render_frames() { return frames; }
+
+        /**
+         * @brief Handles surface changes, only applicable if the render_context makes use of a swapchain
+         */
+        bool handle_surface_changes(bool force_update = false);
+
     protected:
         vk::Extent2D surface_extent;
 
@@ -60,6 +121,8 @@ namespace vkb::rendering
         vkb::core::HPPSwapchainProperties swapchain_properties;
 
         std::vector<std::unique_ptr<HPPRenderFrame>> frames;
+
+        vk::Semaphore acquired_semaphore;
 
         bool prepared{ false };
 

@@ -29,8 +29,54 @@ namespace vkb::rendering
         HPPRenderFrame(HPPRenderFrame&&) = delete;
         HPPRenderFrame& operator=(const HPPRenderFrame&) = delete;
         HPPRenderFrame& operator=(HPPRenderFrame&&) = delete;
+
+        vkb::core::HPPDevice& get_device() { return device; }
+
+        vk::Fence request_fence();
+        vk::Semaphore request_semaphore();
+        vk::Semaphore request_semaphore_with_ownership();
+
+        /**
+         * @brief Requests a command buffer to the command pool of the active frame
+         *        A frame should be active at the moment of requesting it
+         * @param queue The queue command buffers will be submitted on
+         * @param reset_mode Indicate how the command buffer will be used, may trigger a
+         *        pool re-creation to set necessary flags
+         * @param level Command buffer level, either primary or secondary
+         * @param thread_index Selects the thread's command pool used to manage the buffer
+         * @return A command buffer related to the current active frame
+         */
+        vkb::core::HPPCommandBuffer& request_command_buffer(
+            const vkb::core::HPPQueue&  queue,
+            vkb::CommandBufferResetMode reset_mode   = vkb::CommandBufferResetMode::ResetPool,
+            vk::CommandBufferLevel      level        = vk::CommandBufferLevel::ePrimary,
+            size_t                      thread_index = 0
+        );
+
+        /**
+         * @brief Called when the swapchain changes
+         * @param render_target A new render target with updated images
+         */
+        void update_render_target(std::unique_ptr<HPPRenderTarget>&& render_target);
+
+    private:
+        /**
+         * @brief Retrieve the frame's command pool(s)
+         * @param queue The queue command buffers will be submitted on
+         * @param reset_mode Indicate how the command buffers will be reset after execution,
+         *        may trigger a pool re-creation to set necessary flags
+         * @return The frame's command pool(s)
+         */
+        std::vector<std::unique_ptr<vkb::core::HPPCommandPool>>& get_command_pools(
+            const vkb::core::HPPQueue& queue,
+            vkb::CommandBufferResetMode reset_mode
+        );
+
     private:
         vkb::core::HPPDevice& device;
+
+        // Command pools associated with the frame
+        std::map<uint32_t, std::vector<std::unique_ptr<vkb::core::HPPCommandPool>>> command_pools;
         
         size_t thread_count;
 

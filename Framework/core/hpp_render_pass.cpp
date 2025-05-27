@@ -4,7 +4,7 @@ namespace vkb::core
 {
     HPPRenderPass::HPPRenderPass(HPPDevice&                                        device,
                                  const std::vector<vkb::rendering::HPPAttachment>& attachments,
-                                 const std::vector<vkb::common::HPPLoadStoreInfo>& load_store_infos,
+                                 const std::vector<vkb::HPPLoadStoreInfo>& load_store_infos,
                                  const std::vector<HPPSubpassInfo>&                subpasses) :
         VulkanResource{ nullptr, &device },
         subpass_count{ std::max<size_t>(1, subpasses.size()) },       // At least 1 subpass
@@ -12,13 +12,13 @@ namespace vkb::core
     {
         if (device.is_enabled(VK_KHR_CREATE_RENDERPASS_2_EXTENSION_NAME))
         {
-            create_renderpass<vk::SubpassDescription2KHR, vk::AttachmentDescription2KHR, vk::AttachmentReference2KHR, vk::SubpassDescription2KHR, vk::RenderPassCreateInfo2KHR>(
+            create_renderpass<vk::SubpassDescription2KHR, vk::AttachmentDescription2KHR, vk::AttachmentReference2KHR, vk::SubpassDependency2KHR, vk::RenderPassCreateInfo2KHR>(
                 attachments, load_store_infos, subpasses
             );
         }
         else
         {
-            create_renderpass<vk::SubpassDescription, vk::AttachmentDescription, vk::AttachmentReference, vk::SubpassDescription, vk::RenderPassCreateInfo>(
+            create_renderpass<vk::SubpassDescription, vk::AttachmentDescription, vk::AttachmentReference, vk::SubpassDependency, vk::RenderPassCreateInfo>(
                 attachments, load_store_infos, subpasses
             );
         }
@@ -50,7 +50,7 @@ namespace vkb::core
     }
 
     template <typename T>
-    std::vector<T> get_attachment_descriptions(const std::vector<vkb::rendering::HPPAttachment>& attachments, const std::vector<vkb::common::HPPLoadStoreInfo>& load_store_infos)
+    std::vector<T> get_attachment_descriptions(const std::vector<vkb::rendering::HPPAttachment>& attachments, const std::vector<vkb::HPPLoadStoreInfo>& load_store_infos)
     {
         std::vector<T> attachment_descriptions;
 
@@ -62,7 +62,7 @@ namespace vkb::core
             attachment.samples = attachments[i].samples;
             attachment.initialLayout = attachments[i].initial_layout;
             attachment.finalLayout =
-                vkb::common::is_depth_format(attachment.format) ? vk::ImageLayout::eDepthStencilAttachmentOptimal : vk::ImageLayout::eColorAttachmentOptimal;
+                vkb::is_depth_format(attachment.format) ? vk::ImageLayout::eDepthStencilAttachmentOptimal : vk::ImageLayout::eColorAttachmentOptimal;
 
             if (i < load_store_infos.size())
             {
@@ -192,7 +192,7 @@ namespace vkb::core
                 attachment_descriptions[reference.attachment].finalLayout = reference.layout;
 
                 // Do not use depth attachment if used as input
-                if (vkb::common::is_depth_format(attachment_descriptions[reference.attachment].format))
+                if (vkb::is_depth_format(attachment_descriptions[reference.attachment].format))
                 {
                     subpass.pDepthStencilAttachment = nullptr;
                 }
@@ -220,10 +220,94 @@ namespace vkb::core
         }
     }
 
+    template <typename T>
+    std::vector<T> get_subpass_dependencies(const size_t subpass_count, bool depth_stencil_dependency)
+    {
+        std::vector<T> dependencies{};
+
+        if (subpass_count > 1)
+        {
+            for (uint32_t subpass_id = 0; subpass_id < static_cast<uint32_t>(subpass_count - 1); ++subpass_id)
+            {
+                /**
+                 * srcSubpass    - Index of a first (previous) subpass or VK_SUBPASS_EXTERNAL
+                 * dstSubpass    - Index of a second (later) subpass or VK_SUBPASS_EXTERNAL
+                 * srcStageMask  - What pipeline stage must have completed for the dependency
+                 * dstStageMask  - What pipeline stage is waiting on the dependency
+                 * srcAccessMask - What access scopes are influence the dependency
+                 * dstAccessMask - What access scopes are waiting on the dependency
+                 */
+                T color_dep{};
+                color_dep.srcSubpass = subpass_id;
+                color_dep.dstSubpass = subpass_id + 1;
+                color_dep.srcStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+                color_dep.dstStageMask = vk::PipelineStageFlagBits::eColorAttachmentOutput | vk::PipelineStageFlagBits::eFragmentShader;
+                color_dep.srcAccessMask = vk::AccessFlagBits::eColorAttachmentWrite;
+                color_dep.dstAccessMask = vk::AccessFlagBits::eInputAttachmentRead | vk::AccessFlagBits::eColorAttachmentRead | vk::AccessFlagBits::eColorAttachmentWrite;
+                color_dep.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+                dependencies.push_back(color_dep);
+
+                if (depth_stencil_dependency)
+                {
+                    T depth_dep{};
+                    depth_dep.srcSubpass = subpass_id;
+                    depth_dep.dstSubpass = subpass_id + 1;
+                    depth_dep.srcStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
+                    depth_dep.dstStageMask = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests | vk::PipelineStageFlagBits::eFragmentShader;
+                    depth_dep.srcAccessMask = vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+                    depth_dep.dstAccessMask = vk::AccessFlagBits::eInputAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+                    depth_dep.dependencyFlags = vk::DependencyFlagBits::eByRegion;
+                    dependencies.push_back(depth_dep);
+                }
+            }
+        }
+
+        return dependencies;
+    }
+
+    /**
+     * @brief Assuming there is only one depth attachment
+     */
+    template <typename T_SubpassDescription, typename T_AttachmentDescription>
+    bool is_depth_a_dependency(std::vector<T_SubpassDescription>& subpass_descriptions, std::vector<T_AttachmentDescription>& attachment_descriptions)
+    {
+        // More than 1 subpass uses depth
+        if (std::ranges::count_if(subpass_descriptions,
+                                  [](const auto& subpass) {
+                                      return subpass.pDepthStencilAttachment != nullptr;
+                                  }) > 1)
+        {
+            return true;
+        }
+
+        // Otherwise check if any uses depth as an input
+        return std::ranges::any_of(
+            subpass_descriptions,
+            [&attachment_descriptions](auto const& subpass) {
+                return std::ranges::any_of(
+                    std::span{ subpass.pInputAttachments, subpass.inputAttachmentCount },
+                    [&attachment_descriptions](auto const& reference) {
+                        return vkb::is_depth_format(attachment_descriptions[reference.attachment].format);
+                    });
+            });
+
+        return false;
+    }
+
+    inline vk::RenderPass create_vk_renderpass(vk::Device device, vk::RenderPassCreateInfo& create_info)
+    {
+        return device.createRenderPass(create_info);
+    }
+
+    inline vk::RenderPass create_vk_renderpass(vk::Device device, vk::RenderPassCreateInfo2KHR& create_info)
+    {
+        return device.createRenderPass2KHR(create_info);
+    }
+
     template <typename T_SubpassDescription, typename T_AttachmentDescription, typename T_AttachmentReference, typename T_SubpassDependency, typename T_RenderPassCreateInfo>
     void HPPRenderPass::create_renderpass(
         const std::vector<vkb::rendering::HPPAttachment>& attachments,
-        const std::vector<vkb::common::HPPLoadStoreInfo>& load_store_infos,
+        const std::vector<vkb::HPPLoadStoreInfo>& load_store_infos,
         const std::vector<HPPSubpassInfo>& subpasses
     )
     {
@@ -245,7 +329,7 @@ namespace vkb::core
             {
                 auto initial_layout = attachments[o_attachment].initial_layout == vk::ImageLayout::eUndefined ? vk::ImageLayout::eColorAttachmentOptimal : attachments[o_attachment].initial_layout;
                 auto& description = attachment_descriptions[o_attachment];
-                if (!vkb::common::is_depth_format(description.format))
+                if (!vkb::is_depth_format(description.format))
                 {
                     color_attachments[i].push_back(get_attachment_reference<T_AttachmentReference>(o_attachment, initial_layout));
                 }
@@ -254,7 +338,7 @@ namespace vkb::core
             // Fill input attachments references
             for (auto i_attachment : subpass.input_attachments)
             {
-                auto initial_layout = vkb::common::is_depth_format(attachments[i_attachment].format) ? vk::ImageLayout::eDepthStencilReadOnlyOptimal : vk::ImageLayout::eShaderReadOnlyOptimal;
+                auto initial_layout = vkb::is_depth_format(attachments[i_attachment].format) ? vk::ImageLayout::eDepthStencilReadOnlyOptimal : vk::ImageLayout::eShaderReadOnlyOptimal;
                 input_attachments[i].push_back(get_attachment_reference<T_AttachmentReference>(i_attachment, initial_layout));
             }
 
@@ -267,7 +351,7 @@ namespace vkb::core
             if (!subpass.disable_depth_stencil_attachment)
             {
                 // Assumption: depth stencil attachment appears in the list before any depth stencil resolve attachment
-                auto it = std::ranges::find_if(attachments, [](const vkb::rendering::HPPAttachment attachment) {return vkb::common::is_depth_format(attachment.format); });
+                auto it = std::ranges::find_if(attachments, [](const vkb::rendering::HPPAttachment attachment) {return vkb::is_depth_format(attachment.format); });
                 if (it != attachments.end())
                 {
                     auto i_depth_stencil = static_cast<uint32_t>(std::distance(attachments.begin(), it));
@@ -334,7 +418,7 @@ namespace vkb::core
 
             for (uint32_t k = 0U; k < static_cast<uint32_t>(attachment_descriptions.size()); ++k)
             {
-                if (vkb::common::is_depth_format(attachments[k].format))
+                if (vkb::is_depth_format(attachments[k].format))
                 {
                     if (default_depth_stencil_attachment == VK_ATTACHMENT_UNUSED)
                     {
@@ -366,6 +450,16 @@ namespace vkb::core
             color_output_count.push_back(static_cast<uint32_t>(color_attachments[i].size()));
         }
 
-        // TODO
+        const auto& subpass_dependencies = get_subpass_dependencies<T_SubpassDependency>(subpass_count, is_depth_a_dependency(subpass_descriptions, attachment_descriptions));
+
+        T_RenderPassCreateInfo create_info{};
+        create_info.attachmentCount = static_cast<uint32_t>(attachment_descriptions.size());
+        create_info.pAttachments = attachment_descriptions.data();
+        create_info.subpassCount = static_cast<uint32_t>(subpass_descriptions.size());
+        create_info.pSubpasses = subpass_descriptions.data();
+        create_info.dependencyCount = static_cast<uint32_t>(subpass_dependencies.size());
+        create_info.pDependencies = subpass_dependencies.data();
+
+        set_handle(create_vk_renderpass(get_device().get_handle(), create_info));
     }
 }

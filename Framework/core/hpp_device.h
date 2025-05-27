@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hpp_resource_cache.h"
+
 namespace vkb::core
 {
     class HPPPhysicalDevice;
@@ -43,6 +45,8 @@ namespace vkb::core
 
         uint32_t get_queue_family_index(vk::QueueFlagBits queue_flag) const;
 
+        vkb::HPPResourceCache& get_resource_cache() { return resource_cache; }
+
     private:
         const HPPPhysicalDevice& gpu;
 
@@ -51,5 +55,10 @@ namespace vkb::core
         std::vector<const char*> enabled_extensions{};
 
         std::vector<std::vector<HPPQueue>> queues;
+
+        // A command pool associated to the primary queue
+        // std::unique_ptr<HPPCommandPool> command_pool;
+
+        vkb::HPPResourceCache resource_cache;
     };
 }

@@ -69,6 +69,19 @@
     <ClInclude Include="core\hpp_render_pass.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="core\hpp_command_pool.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hpp_command_buffer.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering\hpp_render_pipeline.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="hpp_resource_cache.h" />
+    <ClInclude Include="core\hpp_framebuffer.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -123,6 +136,19 @@
     </ClCompile>
     <ClCompile Include="builder_base.cpp" />
     <ClCompile Include="core\hpp_render_pass.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_command_pool.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_command_buffer.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\hpp_render_pipeline.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="hpp_resource_cache.cpp" />
+    <ClCompile Include="core\hpp_framebuffer.cpp">
       <Filter>core</Filter>
     </ClCompile>
   </ItemGroup>

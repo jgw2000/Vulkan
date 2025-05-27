@@ -2,7 +2,7 @@
 
 namespace vkb::core
 {
-    class HPPImageView : VulkanResource<vk::ImageView>
+    class HPPImageView : public VulkanResource<vk::ImageView>
     {
     public:
         HPPImageView(HPPImage& image,

@@ -27,7 +27,7 @@ namespace vkb::core
     public:
         HPPRenderPass(HPPDevice&                                        device,
                       const std::vector<vkb::rendering::HPPAttachment>& attachments,
-                      const std::vector<vkb::common::HPPLoadStoreInfo>& load_store_infos,
+                      const std::vector<vkb::HPPLoadStoreInfo>& load_store_infos,
                       const std::vector<HPPSubpassInfo>&                subpasses);
         ~HPPRenderPass();
 
@@ -45,7 +45,7 @@ namespace vkb::core
         template <typename T_SubpassDescription, typename T_AttachmentDescription, typename T_AttachmentReference, typename T_SubpassDependency, typename T_RenderPassCreateInfo>
         void create_renderpass(
             const std::vector<vkb::rendering::HPPAttachment>& attachments,
-            const std::vector<vkb::common::HPPLoadStoreInfo>& load_store_infos,
+            const std::vector<vkb::HPPLoadStoreInfo>& load_store_infos,
             const std::vector<HPPSubpassInfo>&                subpasses
         );
 

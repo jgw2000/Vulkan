@@ -66,4 +66,123 @@ namespace vkb::rendering
         this->thread_count              = thread_count;
         this->prepared                  = true;
     }
+
+    vkb::core::HPPCommandBuffer& HPPRenderContext::begin(vkb::CommandBufferResetMode reset_mode)
+    {
+        assert(prepared && "HPPRenderContext not prepared for rendering, call prepare()");
+
+        if (!frame_active)
+        {
+            begin_frame();
+        }
+
+        if (!acquired_semaphore)
+        {
+            throw std::runtime_error("Couldn't begin frame");
+        }
+
+        const auto& queue = device.get_queue_by_flags(vk::QueueFlagBits::eGraphics, 0);
+
+        return get_active_frame().request_command_buffer(queue, reset_mode);
+    }
+
+    void HPPRenderContext::update_swapchain(const vk::Extent2D& extent, const vk::SurfaceTransformFlagBitsKHR transform)
+    {
+        if (!swapchain)
+        {
+            return;
+        }
+
+        auto width = extent.width;
+        auto height = extent.height;
+        if ((transform & vk::SurfaceTransformFlagBitsKHR::eRotate90) || (transform & vk::SurfaceTransformFlagBitsKHR::eRotate270))
+        {
+            // Pre-rotation: always use native orientation i.e. if rotated, use width and height of identity transform
+            std::swap(width, height);
+        }
+
+        swapchain = std::make_unique<vkb::core::HPPSwapchain>(*swapchain, vk::Extent2D{ width, height }, transform);
+
+        // Save the preTransform attribute for future rotations
+        pre_transform = transform;
+
+        recreate();
+    }
+
+    void HPPRenderContext::recreate()
+    {
+        vk::Extent2D swapchain_extent = swapchain->get_extent();
+        vk::Extent3D extent{ swapchain_extent.width, swapchain_extent.height, 1 };
+
+        auto frame_it = frames.begin();
+        for (auto& image_handle : swapchain->get_images())
+        {
+            vkb::core::HPPImage swapchain_image{ device, image_handle, extent, swapchain->get_format(), swapchain->get_usage() };
+            auto render_target = create_render_target_func(std::move(swapchain_image));
+
+            if (frame_it != frames.end())
+            {
+                (*frame_it)->update_render_target(std::move(render_target));
+            }
+            else
+            {
+                // Create a new frame if the new swapchain has more images than current frames
+                frames.emplace_back(std::make_unique<HPPRenderFrame>(device, std::move(render_target), thread_count));
+            }
+
+            ++frame_it;
+        }
+
+        device.get_resource_cache().clear_framebuffers();
+    }
+
+    void HPPRenderContext::begin_frame()
+    {
+        // Only handle surface changes if a swapchain exists
+        if (swapchain)
+        {
+            handle_surface_changes();
+        }
+
+        assert(!frame_active && "Frame is still active, please call end_frame");
+
+        auto& prev_frame = *frames[active_frame_index];
+
+        // We will use the acquired semaphore in a different frame context.
+        // so we need to hold ownership.
+        acquired_semaphore = prev_frame.request_semaphore_with_ownership();
+
+        // TODO
+    }
+
+    bool HPPRenderContext::handle_surface_changes(bool force_update)
+    {
+        if (!swapchain)
+        {
+            return false;
+        }
+
+        auto surface_properties = device.get_gpu().get_handle().getSurfaceCapabilitiesKHR(swapchain->get_surface());
+        if (surface_properties.currentExtent.width == 0xFFFFFFFF)
+        {
+            return false;
+        }
+
+        // Only recreate the swapchain if the dimension have changed;
+        // handle_surface_changes() is called on VK_SUBOPTIMAL_KHR,
+        // which might not be due to a surface resize
+        if (surface_properties.currentExtent.width != surface_extent.width ||
+            surface_properties.currentExtent.height != surface_extent.height ||
+            force_update)
+        {
+            // Recreate swapchain
+            device.get_handle().waitIdle();
+
+            update_swapchain(surface_properties.currentExtent, pre_transform);
+            surface_extent = surface_properties.currentExtent;
+            return true;
+        }
+
+        return false;
+    }
 }

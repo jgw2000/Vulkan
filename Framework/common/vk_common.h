@@ -1,8 +1,15 @@
 #pragma once
 
 
-namespace vkb::common
+namespace vkb
 {
+    enum class CommandBufferResetMode
+    {
+        ResetPool,
+        ResetIndividually,
+        AlwaysAllocate,
+    };
+
     struct HPPLoadStoreInfo
     {
         vk::AttachmentLoadOp load_op = vk::AttachmentLoadOp::eClear;

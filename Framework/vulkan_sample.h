@@ -182,12 +182,18 @@ namespace vkb
          */
         void create_render_context(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list);
 
-        core::HPPInstance&                 get_instance()             { return *instance; }
-        const core::HPPInstance&           get_instance() const       { return *instance; }
-        core::HPPDevice&                   get_device()               { return *device; }
-        const core::HPPDevice&             get_device() const         { return *device; }
-        rendering::HPPRenderContext&       get_render_context()       { return *render_context; }
-        const rendering::HPPRenderContext& get_render_context() const { return *render_context; }
+        core::HPPInstance&                  get_instance()              { return *instance; }
+        const core::HPPInstance&            get_instance() const        { return *instance; }
+        core::HPPDevice&                    get_device()                { return *device; }
+        const core::HPPDevice&              get_device() const          { return *device; }
+        rendering::HPPRenderContext&        get_render_context()        { return *render_context; }
+        const rendering::HPPRenderContext&  get_render_context() const  { return *render_context; }
+        rendering::HPPRenderPipeline&       get_render_pipeline()       { return *render_pipeline; }
+        const rendering::HPPRenderPipeline& get_render_pipeline() const { return *render_pipeline; }
+
+        void set_render_context(std::unique_ptr<rendering::HPPRenderContext>&& render_context);
+        void set_render_pipeline(std::unique_ptr<rendering::HPPRenderPipeline>&& render_pipeline);
+
 
         /// <summary>
         /// PRIVATE INTERFACE
@@ -241,6 +247,11 @@ namespace vkb
          * @brief Context used for rendering, it is responsible for managing the frames and their underlying images
          */
         std::unique_ptr<rendering::HPPRenderContext> render_context;
+
+        /**
+         * @brief Pipeline used for rendering, it should be set up by the concrete sample
+         */
+        std::unique_ptr<rendering::HPPRenderPipeline> render_pipeline;
 
         /**
          * @brief The Vulkan surface

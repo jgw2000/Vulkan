@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-namespace vkb::common
+namespace vkb
 {
     bool is_depth_only_format(vk::Format format)
     {
