@@ -297,4 +297,10 @@ namespace vkb::core
             device.get_handle().destroySwapchainKHR(handle);
         }
     }
+
+    std::pair<vk::Result, uint32_t> HPPSwapchain::acquire_next_image(vk::Semaphore image_acquired_semaphore, vk::Fence fence) const
+    {
+        vk::ResultValue<uint32_t> rv = device.get_handle().acquireNextImageKHR(handle, std::numeric_limits<uint64_t>::max(), image_acquired_semaphore, fence);
+        return std::make_pair(rv.result, rv.value);
+    }
 }

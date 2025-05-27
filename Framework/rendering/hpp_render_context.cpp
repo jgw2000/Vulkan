@@ -152,7 +152,47 @@ namespace vkb::rendering
         // so we need to hold ownership.
         acquired_semaphore = prev_frame.request_semaphore_with_ownership();
 
-        // TODO
+        if (swapchain)
+        {
+            vk::Result result;
+            try
+            {
+                std::tie(result, active_frame_index) = swapchain->acquire_next_image(acquired_semaphore);
+            }
+            catch (vk::OutOfDateKHRError&)
+            {
+                result = vk::Result::eErrorOutOfDateKHR;
+            }
+
+            if (result == vk::Result::eSuboptimalKHR || result == vk::Result::eErrorOutOfDateKHR)
+            {
+                bool swapchain_updated = handle_surface_changes(result == vk::Result::eErrorOutOfDateKHR);
+                if (swapchain_updated)
+                {
+                    // Need to destroy and reallocate acquired_semaphore since it may have already been signaled
+                    device.get_handle().destroySemaphore(acquired_semaphore);
+                    acquired_semaphore = prev_frame.request_semaphore_with_ownership();
+                    std::tie(result, active_frame_index) = swapchain->acquire_next_image(acquired_semaphore);
+                }
+            }
+
+            if (result != vk::Result::eSuccess)
+            {
+                prev_frame.reset();
+                return;
+            }
+        }
+
+        // Now the frame is active again
+        frame_active = true;
+
+        // Wait on all resource to be freed from the previous render to this frame
+        wait_frame();
+    }
+
+    void HPPRenderContext::wait_frame()
+    {
+        get_active_frame().reset();
     }
 
     bool HPPRenderContext::handle_surface_changes(bool force_update)

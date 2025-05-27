@@ -1,5 +1,8 @@
 #pragma once
 
+#include "hpp_fence_pool.h"
+#include "hpp_semaphore_pool.h"
+
 namespace vkb::rendering
 {
     /**
@@ -32,9 +35,10 @@ namespace vkb::rendering
 
         vkb::core::HPPDevice& get_device() { return device; }
 
-        vk::Fence request_fence();
+        vk::Fence     request_fence();
         vk::Semaphore request_semaphore();
         vk::Semaphore request_semaphore_with_ownership();
+        void          reset();
 
         /**
          * @brief Requests a command buffer to the command pool of the active frame
@@ -77,9 +81,11 @@ namespace vkb::rendering
 
         // Command pools associated with the frame
         std::map<uint32_t, std::vector<std::unique_ptr<vkb::core::HPPCommandPool>>> command_pools;
+
+        vkb::HPPFencePool fence_pool;
+        vkb::HPPSemaphorePool semaphore_pool;
         
         size_t thread_count;
-
         std::unique_ptr<HPPRenderTarget> swapchain_render_target;
     };
 }

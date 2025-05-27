@@ -4,6 +4,8 @@ namespace vkb::rendering
 {
     HPPRenderFrame::HPPRenderFrame(vkb::core::HPPDevice& device, std::unique_ptr<HPPRenderTarget>&& render_target, size_t thread_count) :
         device{ device },
+        fence_pool{device},
+        semaphore_pool{device},
         swapchain_render_target{ std::move(render_target) },
         thread_count{ thread_count }
     {
@@ -12,20 +14,35 @@ namespace vkb::rendering
 
     vk::Fence HPPRenderFrame::request_fence()
     {
-        // TODO
-        return nullptr;
+        return fence_pool.request_fence();
     }
 
     vk::Semaphore HPPRenderFrame::request_semaphore()
     {
-        // TODO
-        return nullptr;
+        return semaphore_pool.request_semaphore();
     }
 
     vk::Semaphore HPPRenderFrame::request_semaphore_with_ownership()
     {
+        return semaphore_pool.request_semaphore_with_ownership();
+    }
+
+    void HPPRenderFrame::reset()
+    {
+        fence_pool.wait();
+        fence_pool.reset();
+
+        for (auto& command_pools_per_queue : command_pools)
+        {
+            for (auto& command_pool : command_pools_per_queue.second)
+            {
+                command_pool->reset_pool();
+            }
+        }
+
+        semaphore_pool.reset();
+
         // TODO
-        return nullptr;
     }
 
     vkb::core::HPPCommandBuffer& HPPRenderFrame::request_command_buffer(

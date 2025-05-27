@@ -70,6 +70,11 @@ namespace vkb::rendering
         void begin_frame();
 
         /**
+         * @brief Waits a frame to finish its rendering
+         */
+        void wait_frame();
+
+        /**
          * @brief A frame is active after @ref begin_frame has been called.
          * @return The current active frame
          */

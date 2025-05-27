@@ -82,6 +82,8 @@
     <ClInclude Include="core\hpp_framebuffer.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="hpp_semaphore_pool.h" />
+    <ClInclude Include="hpp_fence_pool.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -151,5 +153,7 @@
     <ClCompile Include="core\hpp_framebuffer.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="hpp_semaphore_pool.cpp" />
+    <ClCompile Include="hpp_fence_pool.cpp" />
   </ItemGroup>
 </Project>

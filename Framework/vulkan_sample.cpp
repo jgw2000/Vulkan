@@ -99,6 +99,8 @@ namespace vkb
     void VulkanSample::update(float delta_time)
     {
         Application::update(delta_time);
+
+        auto& command_buffer = render_context->begin();
     }
 
     void VulkanSample::finish()

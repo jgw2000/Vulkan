@@ -75,6 +75,37 @@ namespace vkb::core
 
     void HPPCommandPool::reset_pool()
     {
-        // TODO
+        switch (reset_mode)
+        {
+        case vkb::CommandBufferResetMode::ResetIndividually:
+            for (auto& cmd_buf : primary_command_buffers)
+            {
+                cmd_buf.reset(reset_mode);
+            }
+            active_primary_command_buffer_count = 0;
+
+            for (auto& cmd_buf : secondary_command_buffers)
+            {
+                cmd_buf.reset(reset_mode);
+            }
+            active_secondary_command_buffer_count = 0;
+            break;
+
+        case vkb::CommandBufferResetMode::ResetPool:
+            device.get_handle().resetCommandPool(handle);
+            active_primary_command_buffer_count = 0;
+            active_secondary_command_buffer_count = 0;
+            break;
+
+        case vkb::CommandBufferResetMode::AlwaysAllocate:
+            primary_command_buffers.clear();
+            active_primary_command_buffer_count = 0;
+            secondary_command_buffers.clear();
+            active_secondary_command_buffer_count = 0;
+            break;
+
+        default:
+            throw std::runtime_error("Unknown reset mode for command pools");
+        }
     }
 }

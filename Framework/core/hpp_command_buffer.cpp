@@ -24,4 +24,40 @@ namespace vkb::core
             this->get_device().get_handle().freeCommandBuffers(command_pool.get_handle(), this->get_handle());
         }
     }
+
+    void HPPCommandBuffer::begin(vk::CommandBufferUsageFlags flags, HPPCommandBuffer* primary_cmd_buf)
+    {
+        if (level == vk::CommandBufferLevel::eSecondary)
+        {
+            assert(primary_cmd_buf && "A primary command buffer pointer must be provided when calling begin from a secondary one");
+
+            // TODO
+        }
+        else
+        {
+            return begin_impl(flags, nullptr, nullptr, 0);
+        }
+    }
+
+    void HPPCommandBuffer::begin(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index)
+    {
+        begin_impl(flags, render_pass, framebuffer, subpass_index);
+    }
+
+    vk::Result HPPCommandBuffer::reset(vkb::CommandBufferResetMode reset_mode)
+    {
+        assert(reset_mode == command_pool.get_reset_mode() && "Command buffer reset mode must match the one used by the pool to allocate it");
+
+        if (reset_mode == vkb::CommandBufferResetMode::ResetIndividually)
+        {
+            this->get_handle().reset(vk::CommandBufferResetFlagBits::eReleaseResources);
+        }
+
+        return vk::Result::eSuccess;
+    }
+
+    void HPPCommandBuffer::begin_impl(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index)
+    {
+        // TODO
+    }
 }

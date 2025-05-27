@@ -78,6 +78,8 @@ namespace vkb::core
         vk::SurfaceKHR                  get_surface() const      { return surface; }
         vk::ImageUsageFlags             get_usage() const        { return properties.image_usage; }
         vk::PresentModeKHR              get_present_mode() const { return properties.present_mode; }
+
+        std::pair<vk::Result, uint32_t> acquire_next_image(vk::Semaphore image_acquired_semaphore, vk::Fence fence = nullptr) const;
         
     private:
         HPPDevice& device;

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "hpp_resource_cache.h"
 
 namespace vkb
 {

@@ -38,3 +38,7 @@
 #include "rendering/hpp_render_frame.h"
 #include "rendering/hpp_render_context.h"
 #include "rendering/hpp_render_pipeline.h"
+
+#include "hpp_resource_cache.h"
+#include "hpp_semaphore_pool.h"
+#include "hpp_fence_pool.h"
