@@ -44,6 +44,11 @@ namespace vkb::core
         begin_impl(flags, render_pass, framebuffer, subpass_index);
     }
 
+    void HPPCommandBuffer::end()
+    {
+        this->get_handle().end();
+    }
+
     vk::Result HPPCommandBuffer::reset(vkb::CommandBufferResetMode reset_mode)
     {
         assert(reset_mode == command_pool.get_reset_mode() && "Command buffer reset mode must match the one used by the pool to allocate it");
@@ -59,5 +64,24 @@ namespace vkb::core
     void HPPCommandBuffer::begin_impl(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index)
     {
         // TODO
+
+        vk::CommandBufferBeginInfo begin_info{ flags };
+        vk::CommandBufferInheritanceInfo inheritance;
+
+        if (level == vk::CommandBufferLevel::eSecondary)
+        {
+            assert((render_pass && framebuffer) && "Render pass and framebuffer must be provided with calling begin from a secondary one");
+
+            current_render_pass = render_pass;
+            current_framebuffer = framebuffer;
+
+            inheritance.renderPass = current_render_pass->get_handle();
+            inheritance.framebuffer = current_framebuffer->get_handle();
+            inheritance.subpass = subpass_index;
+
+            begin_info.pInheritanceInfo = &inheritance;
+        }
+
+        this->get_handle().begin(begin_info);
     }
 }

@@ -195,6 +195,120 @@ namespace vkb::rendering
         get_active_frame().reset();
     }
 
+    void HPPRenderContext::end_frame(vk::Semaphore semaphore)
+    {
+        assert(frame_active && "Frame is not active, please call begin_frame");
+
+        if (swapchain)
+        {
+            vk::SwapchainKHR vk_swapchain = swapchain->get_handle();
+            vk::PresentInfoKHR present_info{
+                1,
+                &semaphore,
+                1,
+                &vk_swapchain,
+                &active_frame_index
+            };
+
+            vk::Result result;
+            try
+            {
+                result = queue.present(present_info);
+            }
+            catch (vk::OutOfDateKHRError&)
+            {
+                result = vk::Result::eErrorOutOfDateKHR;
+            }
+
+            if (result == vk::Result::eSuboptimalKHR || result == vk::Result::eErrorOutOfDateKHR)
+            {
+                handle_surface_changes();
+            }
+        }
+
+        // Frame is not active anymore
+        if (acquired_semaphore)
+        {
+            release_owned_semaphore(acquired_semaphore);
+            acquired_semaphore = nullptr;
+        }
+
+        frame_active = false;
+    }
+
+    void HPPRenderContext::submit(vkb::core::HPPCommandBuffer& command_buffer)
+    {
+        submit({ &command_buffer });
+    }
+
+    void HPPRenderContext::submit(const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers)
+    {
+        assert(frame_active && "HPPRenderContext is inactive, cannot submit command buffer. Please call begin()");
+
+        vk::Semaphore render_semaphore;
+
+        if (swapchain)
+        {
+            assert(acquired_semaphore && "We do not have acquired_semaphore, it was probably consumed?");
+            render_semaphore = submit(queue, command_buffers, acquired_semaphore, vk::PipelineStageFlagBits::eColorAttachmentOutput);
+        }
+        else
+        {
+            submit(queue, command_buffers);
+        }
+
+        end_frame(render_semaphore);
+    }
+
+    void HPPRenderContext::submit(const vkb::core::HPPQueue& queue, const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers)
+    {
+        std::vector<vk::CommandBuffer> cmd_buf_handles(command_buffers.size(), nullptr);
+        std::ranges::transform(command_buffers, cmd_buf_handles.begin(), [](const vkb::core::HPPCommandBuffer* cmd_buf) { return cmd_buf->get_handle(); });
+
+        auto& frame = get_active_frame();
+
+        vk::SubmitInfo submit_info = {};
+        submit_info.commandBufferCount = static_cast<uint32_t>(cmd_buf_handles.size());
+        submit_info.pCommandBuffers = cmd_buf_handles.data();
+
+        auto fence = frame.request_fence();
+        queue.get_handle().submit(submit_info, fence);
+    }
+
+    vk::Semaphore HPPRenderContext::submit(const vkb::core::HPPQueue&                       queue,
+                                           const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers,
+                                           vk::Semaphore                                    wait_semaphore,
+                                           vk::PipelineStageFlags                           wait_pipeline_stage)
+    {
+        std::vector<vk::CommandBuffer> cmd_buf_handles(command_buffers.size(), nullptr);
+        std::ranges::transform(command_buffers, cmd_buf_handles.begin(), [](const vkb::core::HPPCommandBuffer* cmd_buf) { return cmd_buf->get_handle(); });
+
+        auto& frame = get_active_frame();
+        auto signal_semaphore = frame.request_semaphore();
+
+        vk::SubmitInfo submit_info = {};
+        submit_info.commandBufferCount = static_cast<uint32_t>(cmd_buf_handles.size());
+        submit_info.pCommandBuffers = cmd_buf_handles.data();
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = &signal_semaphore;
+
+        if (wait_semaphore)
+        {
+            submit_info.setWaitSemaphores(wait_semaphore);
+            submit_info.pWaitDstStageMask = &wait_pipeline_stage;
+        }
+
+        auto fence = frame.request_fence();
+        queue.get_handle().submit(submit_info, fence);
+
+        return signal_semaphore;
+    }
+
+    void HPPRenderContext::release_owned_semaphore(vk::Semaphore semaphore)
+    {
+        get_active_frame().release_owned_semaphore(semaphore);
+    }
+
     bool HPPRenderContext::handle_surface_changes(bool force_update)
     {
         if (!swapchain)

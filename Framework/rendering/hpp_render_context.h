@@ -74,36 +74,62 @@ namespace vkb::rendering
          */
         void wait_frame();
 
+        void end_frame(vk::Semaphore semaphore);
+
+        /**
+         * @brief Submits the command buffer to the right queue
+         * @param command_buffer A command buffer containing recorded commands
+         */
+        void submit(vkb::core::HPPCommandBuffer& command_buffer);
+
+        /**
+         * @brief Submits multiple command buffers to the right queue
+         * @param command_buffers Command buffers containing recorded commands
+         */
+        void submit(const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers);
+
+        /**
+         * @brief Submits a command buffer related to a frame to a queue
+         */
+        void submit(const vkb::core::HPPQueue& queue, const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers);
+
+        vk::Semaphore submit(const vkb::core::HPPQueue&                       queue,
+                             const std::vector<vkb::core::HPPCommandBuffer*>& command_buffers,
+                             vk::Semaphore                                    wait_semaphore,
+                             vk::PipelineStageFlags                           wait_pipeline_stage);
+
+        void release_owned_semaphore(vk::Semaphore semaphore);
+
         /**
          * @brief A frame is active after @ref begin_frame has been called.
          * @return The current active frame
          */
-        HPPRenderFrame& get_active_frame() { return *frames[active_frame_index]; }
+        HPPRenderFrame&                               get_active_frame()         { return *frames[active_frame_index]; }
 
         /**
          * @brief A frame is active after @ref begin_frame has been called.
          * @return The current active frame index
          */
-        uint32_t get_active_frame_index() { return active_frame_index; }
+        uint32_t                                      get_active_frame_index()   { return active_frame_index; }
 
         /**
          * @brief A frame is active after @ref begin_frame has been called.
          * @return The previous frame
          */
-        HPPRenderFrame& get_last_rendered_frame() { return *frames[active_frame_index]; }
+        HPPRenderFrame&                               get_last_rendered_frame()  { return *frames[active_frame_index]; }
 
-        vkb::core::HPPDevice& get_device() { return device; }
+        vkb::core::HPPDevice&                         get_device()               { return device; }
 
         /**
          * @brief Returns the format that the RenderTargets are created with the HPPRenderContext
          */
-        vk::Format get_format() const { return swapchain ? swapchain->get_format() : DEFAULT_VK_FORMAT; }
+        vk::Format                                    get_format() const         { return swapchain ? swapchain->get_format() : DEFAULT_VK_FORMAT; }
 
-        const vkb::core::HPPSwapchain& get_swapchain() const { return *swapchain; }
+        const vkb::core::HPPSwapchain&                get_swapchain() const      { return *swapchain; }
 
-        const vk::Extent2D& get_surface_extent() const { return surface_extent; }
+        const vk::Extent2D&                           get_surface_extent() const { return surface_extent; }
 
-        std::vector<std::unique_ptr<HPPRenderFrame>>& get_render_frames() { return frames; }
+        std::vector<std::unique_ptr<HPPRenderFrame>>& get_render_frames()        { return frames; }
 
         /**
          * @brief Handles surface changes, only applicable if the render_context makes use of a swapchain

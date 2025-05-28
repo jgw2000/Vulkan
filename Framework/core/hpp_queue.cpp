@@ -21,4 +21,25 @@ namespace vkb::core
         properties(std::exchange(other.properties, {}))
     {
     }
+
+    void HPPQueue::submit(const HPPCommandBuffer& command_buffer, vk::Fence fence) const
+    {
+        vk::CommandBuffer commandBuffer = command_buffer.get_handle();
+
+        vk::SubmitInfo submit_info = {};
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = &commandBuffer;
+
+        handle.submit(submit_info, fence);
+    }
+
+    vk::Result HPPQueue::present(const vk::PresentInfoKHR& present_info) const
+    {
+        if (!can_present)
+        {
+            return vk::Result::eErrorIncompatibleDisplayKHR;
+        }
+
+        return handle.presentKHR(present_info);
+    }
 }

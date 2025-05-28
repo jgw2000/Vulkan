@@ -33,12 +33,18 @@ namespace vkb::rendering
         HPPRenderFrame& operator=(const HPPRenderFrame&) = delete;
         HPPRenderFrame& operator=(HPPRenderFrame&&) = delete;
 
-        vkb::core::HPPDevice& get_device() { return device; }
+        vkb::core::HPPDevice&        get_device()               { return device; }
+        const vkb::HPPFencePool&     get_fence_pool() const     { return fence_pool; }
+        const vkb::HPPSemaphorePool& get_semaphore_pool() const { return semaphore_pool; }
+        HPPRenderTarget&             get_render_target()        { return *swapchain_render_target; }
+        const HPPRenderTarget&       get_render_target() const  { return *swapchain_render_target; }
 
         vk::Fence     request_fence();
         vk::Semaphore request_semaphore();
         vk::Semaphore request_semaphore_with_ownership();
         void          reset();
+
+        void release_owned_semaphore(vk::Semaphore semaphore);
 
         /**
          * @brief Requests a command buffer to the command pool of the active frame

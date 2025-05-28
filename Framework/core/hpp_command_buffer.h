@@ -38,6 +38,8 @@ namespace vkb::core
          */
         void begin(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index);
 
+        void end();
+
         /**
          * @brief Reset the command buffer to a state where it can be recorded to
          * @param reset_mode How to reset the buffer, should match the one used by the pool to allocate it

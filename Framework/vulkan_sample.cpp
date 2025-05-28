@@ -101,6 +101,11 @@ namespace vkb
         Application::update(delta_time);
 
         auto& command_buffer = render_context->begin();
+
+        command_buffer.begin(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+        command_buffer.end();
+
+        render_context->submit(command_buffer);
     }
 
     void VulkanSample::finish()

@@ -45,6 +45,11 @@ namespace vkb::rendering
         // TODO
     }
 
+    void HPPRenderFrame::release_owned_semaphore(vk::Semaphore semaphore)
+    {
+        semaphore_pool.release_owned_semaphore(semaphore);
+    }
+
     vkb::core::HPPCommandBuffer& HPPRenderFrame::request_command_buffer(
         const vkb::core::HPPQueue&  queue,
         vkb::CommandBufferResetMode reset_mode,

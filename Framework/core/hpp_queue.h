@@ -3,6 +3,7 @@
 namespace vkb::core
 {
     class HPPDevice;
+    class HPPCommandBuffer;
 
     /**
      * @brief A wrapper class for vk::Queue
@@ -18,13 +19,15 @@ namespace vkb::core
         HPPQueue& operator=(const HPPQueue&) = delete;
         HPPQueue& operator=(HPPQueue&&) = delete;
 
-        const HPPDevice& get_device() const { return device; }
-        vk::Queue get_handle() const { return handle; }
-        uint32_t get_family_index() const { return family_index; }
-        uint32_t get_index() const { return index; }
-        const vk::QueueFamilyProperties& get_properties() const { return properties; }
-        vk::Bool32 support_present() const { return can_present; }
+        const HPPDevice&                 get_device() const       { return device; }
+        vk::Queue                        get_handle() const       { return handle; }
+        uint32_t                         get_family_index() const { return family_index; }
+        uint32_t                         get_index() const        { return index; }
+        const vk::QueueFamilyProperties& get_properties() const   { return properties; }
+        vk::Bool32                       support_present() const  { return can_present; }
 
+        void                             submit(const HPPCommandBuffer& command_buffer, vk::Fence fence) const;
+        vk::Result                       present(const vk::PresentInfoKHR& present_info) const;
 
     private:
         HPPDevice& device;
