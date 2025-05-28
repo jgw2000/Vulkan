@@ -108,6 +108,20 @@ namespace vkb
         */
         void update(float delta_time) override;
 
+        /**
+         * @brief Prepares the render target and draws to it, calling draw_renderpass
+         * @param command_buffer The command buffer to record the commands to
+         * @param render_target The render target that is being drawn to
+         */
+        virtual void draw(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target);
+
+        /**
+         * @brief Starts the render pass, executes the render pipeline, and then ends the render pass
+         * @param command_buffer The command buffer to record the commands to
+         * @param render_target The render target that is being drawn to
+         */
+        virtual void draw_renderpass(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target);
+
         void finish() override;
         bool resize(uint32_t width, uint32_t height) override;
 

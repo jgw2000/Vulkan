@@ -103,9 +103,67 @@ namespace vkb
         auto& command_buffer = render_context->begin();
 
         command_buffer.begin(vk::CommandBufferUsageFlagBits::eOneTimeSubmit);
+        draw(command_buffer, render_context->get_active_frame().get_render_target());
         command_buffer.end();
 
         render_context->submit(command_buffer);
+    }
+
+    void VulkanSample::draw(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target)
+    {
+        auto& views = render_target.get_views();
+        {
+            // Image 0 is the swapchain
+            vkb::HPPImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout      = vk::ImageLayout::eUndefined;
+            memory_barrier.new_layout      = vk::ImageLayout::eColorAttachmentOptimal;
+            memory_barrier.src_access_mask = {};
+            memory_barrier.dst_access_mask = vk::AccessFlagBits::eColorAttachmentWrite;
+            memory_barrier.src_stage_mask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+            memory_barrier.dst_stage_mask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+
+            command_buffer.image_memory_barrier(views[0], memory_barrier);
+            render_target.set_layout(0, memory_barrier.new_layout);
+
+            // Skip 1 as it is handled later as a depth-stencil attachment
+            for (size_t i = 2; i < views.size(); ++i)
+            {
+                command_buffer.image_memory_barrier(views[i], memory_barrier);
+                render_target.set_layout(static_cast<uint32_t>(i), memory_barrier.new_layout);
+            }
+        }
+
+        {
+            vkb::HPPImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout      = vk::ImageLayout::eUndefined;
+            memory_barrier.new_layout      = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+            memory_barrier.src_access_mask = {};
+            memory_barrier.dst_access_mask = vk::AccessFlagBits::eDepthStencilAttachmentRead | vk::AccessFlagBits::eDepthStencilAttachmentWrite;
+            memory_barrier.src_stage_mask  = vk::PipelineStageFlagBits::eTopOfPipe;
+            memory_barrier.dst_stage_mask  = vk::PipelineStageFlagBits::eEarlyFragmentTests | vk::PipelineStageFlagBits::eLateFragmentTests;
+
+            command_buffer.image_memory_barrier(views[1], memory_barrier);
+            render_target.set_layout(1, memory_barrier.new_layout);
+        }
+
+        draw_renderpass(command_buffer, render_target);
+
+        {
+            vkb::HPPImageMemoryBarrier memory_barrier{};
+            memory_barrier.old_layout      = vk::ImageLayout::eColorAttachmentOptimal;
+            memory_barrier.new_layout      = vk::ImageLayout::ePresentSrcKHR;
+            memory_barrier.src_access_mask = vk::AccessFlagBits::eColorAttachmentWrite;
+            memory_barrier.src_stage_mask  = vk::PipelineStageFlagBits::eColorAttachmentOutput;
+            memory_barrier.dst_stage_mask  = vk::PipelineStageFlagBits::eBottomOfPipe;
+
+            command_buffer.image_memory_barrier(views[0], memory_barrier);
+            render_target.set_layout(0, memory_barrier.new_layout);
+        }
+    }
+
+    void VulkanSample::draw_renderpass(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target)
+    {
+        // TODO
     }
 
     void VulkanSample::finish()

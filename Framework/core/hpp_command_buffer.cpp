@@ -61,6 +61,39 @@ namespace vkb::core
         return vk::Result::eSuccess;
     }
 
+    void HPPCommandBuffer::image_memory_barrier(const HPPImageView& image_view, const vkb::HPPImageMemoryBarrier& memory_barrier) const
+    {
+        // Adjust barrier's subresource range for depth images
+        auto subresource_range = image_view.get_subresource_range();
+        auto format = image_view.get_format();
+
+        if (vkb::is_depth_only_format(format))
+        {
+            subresource_range.aspectMask = vk::ImageAspectFlagBits::eDepth;
+        }
+        else if (vkb::is_depth_stencil_format(format))
+        {
+            subresource_range.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+        }
+
+        // actively ignore queue family indices provided by memory_barrier !!
+        vk::ImageMemoryBarrier image_memory_barrier{
+            memory_barrier.src_access_mask,
+            memory_barrier.dst_access_mask,
+            memory_barrier.old_layout,
+            memory_barrier.new_layout,
+            vk::QueueFamilyIgnored,
+            vk::QueueFamilyIgnored,
+            image_view.get_image().get_handle(),
+            subresource_range
+        };
+
+        vk::PipelineStageFlags src_stage_mask = memory_barrier.src_stage_mask;
+        vk::PipelineStageFlags dst_stage_mask = memory_barrier.dst_stage_mask;
+
+        this->get_handle().pipelineBarrier(src_stage_mask, dst_stage_mask, {}, {}, {}, image_memory_barrier);
+    }
+
     void HPPCommandBuffer::begin_impl(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index)
     {
         // TODO

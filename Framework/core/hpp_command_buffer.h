@@ -46,6 +46,8 @@ namespace vkb::core
          */
         vk::Result reset(vkb::CommandBufferResetMode reset_mode);
 
+        void image_memory_barrier(const HPPImageView& image_view, const vkb::HPPImageMemoryBarrier& memory_barrier) const;
+
     private:
         void begin_impl(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index);
 
