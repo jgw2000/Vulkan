@@ -163,7 +163,14 @@ namespace vkb
 
     void VulkanSample::draw_renderpass(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target)
     {
+        set_viewport_and_scissor(command_buffer, render_target.get_extent());
+
+        // render is virtual function, thus we have to call that, instead of directly calling render_impl
+        render(command_buffer);
+
         // TODO
+
+        command_buffer.get_handle().endRenderPass();
     }
 
     void VulkanSample::finish()
@@ -179,6 +186,14 @@ namespace vkb
         }
 
         return true;
+    }
+
+    void VulkanSample::render(core::HPPCommandBuffer& command_buffer)
+    {
+        if (render_pipeline)
+        {
+            render_pipeline->draw(command_buffer, render_context->get_active_frame().get_render_target());
+        }
     }
 
     std::unique_ptr<core::HPPInstance> VulkanSample::create_instance()
@@ -254,6 +269,12 @@ namespace vkb
     void VulkanSample::set_render_pipeline(std::unique_ptr<rendering::HPPRenderPipeline>&& rp)
     {
         render_pipeline.reset(rp.release());
+    }
+
+    void VulkanSample::set_viewport_and_scissor(const core::HPPCommandBuffer& command_buffer, const vk::Extent2D& extent)
+    {
+        command_buffer.get_handle().setViewport(0, { {0.0f, 0.0f, static_cast<float>(extent.width), static_cast<float>(extent.height), 0.0f, 1.0f} });
+        command_buffer.get_handle().setScissor(0, vk::Rect2D{ {}, extent });
     }
 
     void VulkanSample::create_render_context_impl(const std::vector<vk::SurfaceFormatKHR>& surface_priority_list)

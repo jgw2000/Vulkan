@@ -44,6 +44,59 @@ namespace vkb::core
         begin_impl(flags, render_pass, framebuffer, subpass_index);
     }
 
+    void HPPCommandBuffer::begin_render_pass(const vkb::rendering::HPPRenderTarget&                          render_target,
+                                             const std::vector<HPPLoadStoreInfo>&                            load_store_infos,
+                                             const std::vector<vk::ClearValue>&                              clear_values,
+                                             const std::vector<std::unique_ptr<vkb::rendering::HPPSubpass>>& subpasses,
+                                             vk::SubpassContents                                             contents)
+    {
+        // TODO
+
+        auto& render_pass = get_render_pass(render_target, load_store_infos, subpasses);
+        auto& framebuffer = this->get_device().get_resource_cache().request_framebuffer(render_target, render_pass);
+
+        begin_render_pass(render_target, render_pass, framebuffer, clear_values, contents);
+    }
+
+    void HPPCommandBuffer::begin_render_pass(const vkb::rendering::HPPRenderTarget& render_target,
+                                             const HPPRenderPass&                   render_pass,
+                                             const HPPFramebuffer&                  framebuffer,
+                                             const std::vector<vk::ClearValue>&     clear_values,
+                                             vk::SubpassContents                    contents)
+    {
+        // TODO
+    }
+
+    void HPPCommandBuffer::next_subpass()
+    {
+        // TODO
+    }
+
+    const HPPRenderPass& HPPCommandBuffer::get_render_pass(const vkb::rendering::HPPRenderTarget&                          render_target,
+                                                           const std::vector<HPPLoadStoreInfo>&                            load_store_infos,
+                                                           const std::vector<std::unique_ptr<vkb::rendering::HPPSubpass>>& subpasses)
+    {
+        // Create render pass
+        assert(subpasses.size() > 0 && "Cannot create a render pass without any subpass");
+
+        std::vector<HPPSubpassInfo> subpass_infos(subpasses.size());
+        auto subpass_info_it = subpass_infos.begin();
+
+        for (auto& subpass : subpasses)
+        {
+            subpass_info_it->input_attachments = subpass->get_input_attachments();
+            subpass_info_it->output_attachments = subpass->get_output_attachments();
+            subpass_info_it->color_resolve_attachments = subpass->get_color_resolve_attachments();
+            subpass_info_it->disable_depth_stencil_attachment = subpass->get_disable_depth_stencil_attachment();
+            subpass_info_it->depth_stencil_resolve_mode = subpass->get_depth_stencil_resolve_mode();
+            subpass_info_it->depth_stencil_resolve_attachment = subpass->get_depth_stencil_resolve_attachment();
+
+            ++subpass_info_it;
+        }
+
+        return this->get_device().get_resource_cache().request_render_pass(render_target.get_attachments(), load_store_infos, subpass_infos);
+    }
+
     void HPPCommandBuffer::end()
     {
         this->get_handle().end();

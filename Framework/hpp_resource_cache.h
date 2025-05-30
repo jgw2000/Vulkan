@@ -2,6 +2,7 @@
 
 #include "core/hpp_render_pass.h"
 #include "core/hpp_framebuffer.h"
+#include "hpp_resource_record.h"
 
 namespace vkb
 {
@@ -39,9 +40,17 @@ namespace vkb
         void clear();
         void clear_framebuffers();
 
+        core::HPPRenderPass& request_render_pass(const std::vector<rendering::HPPAttachment>& attachments,
+                                                 const std::vector<HPPLoadStoreInfo>&         load_store_infos,
+                                                 const std::vector<core::HPPSubpassInfo>&     subpasses);
+        core::HPPFramebuffer& request_framebuffer(const rendering::HPPRenderTarget& render_target, const core::HPPRenderPass& render_pass);
+
     private:
-        vkb::core::HPPDevice& device;
-        vk::PipelineCache pipeline_cache = nullptr;
-        HPPResourceCacheState state = {};
+        vkb::core::HPPDevice&  device;
+        vkb::HPPResourceRecord recorder;
+        vk::PipelineCache      pipeline_cache = nullptr;
+        HPPResourceCacheState  state = {};
+        std::mutex             render_pass_mutex = {};
+        std::mutex             framebuffer_mutex = {};
     };
 }

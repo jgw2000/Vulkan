@@ -1,5 +1,10 @@
 #pragma once
 
+namespace vkb::rendering
+{
+    class HPPSubpass;
+}
+
 namespace vkb::core
 {
     /**
@@ -38,7 +43,24 @@ namespace vkb::core
          */
         void begin(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index);
 
-        void end();
+        void                 begin_render_pass(const vkb::rendering::HPPRenderTarget&                          render_target,
+                                               const std::vector<HPPLoadStoreInfo>&                            load_store_infos,
+                                               const std::vector<vk::ClearValue>&                              clear_values,
+                                               const std::vector<std::unique_ptr<vkb::rendering::HPPSubpass>>& subpasses,
+                                               vk::SubpassContents                                             contents = vk::SubpassContents::eInline);
+
+        void                 begin_render_pass(const vkb::rendering::HPPRenderTarget& render_target,
+                                               const HPPRenderPass&                   render_pass,
+                                               const HPPFramebuffer&                  framebuffer,
+                                               const std::vector<vk::ClearValue>&     clear_values,
+                                               vk::SubpassContents                    contents = vk::SubpassContents::eInline);
+
+        void                 next_subpass();
+        const HPPRenderPass& get_render_pass(const vkb::rendering::HPPRenderTarget&                          render_target,
+                                             const std::vector<HPPLoadStoreInfo>&                            load_store_infos,
+                                             const std::vector<std::unique_ptr<vkb::rendering::HPPSubpass>>& subpasses);
+
+        void                 end();
 
         /**
          * @brief Reset the command buffer to a state where it can be recorded to

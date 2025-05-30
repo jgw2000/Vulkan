@@ -12,10 +12,12 @@
 #include <optional>
 #include <functional>
 #include <algorithm>
+#include <mutex>
 
 #include <Volk/volk.h>
 #include <vma/vk_mem_alloc.h>
 #include <vulkan/vulkan_format_traits.hpp>
+#include <vulkan/vulkan_hash.hpp>
 
 #include "common/vk_common.h"
 #include "platform/window.h"
@@ -38,7 +40,10 @@
 #include "rendering/hpp_render_frame.h"
 #include "rendering/hpp_render_context.h"
 #include "rendering/hpp_render_pipeline.h"
+#include "rendering/hpp_pipeline_state.h"
+#include "rendering/hpp_subpass.h"
 
+#include "hpp_resource_record.h"
 #include "hpp_resource_cache.h"
 #include "hpp_semaphore_pool.h"
 #include "hpp_fence_pool.h"

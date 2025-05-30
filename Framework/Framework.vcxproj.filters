@@ -84,6 +84,19 @@
     </ClInclude>
     <ClInclude Include="hpp_semaphore_pool.h" />
     <ClInclude Include="hpp_fence_pool.h" />
+    <ClInclude Include="rendering\hpp_subpass.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="hpp_resource_record.h" />
+    <ClInclude Include="common\hpp_resource_caching.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\helpers.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering\hpp_pipeline_state.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -155,5 +168,15 @@
     </ClCompile>
     <ClCompile Include="hpp_semaphore_pool.cpp" />
     <ClCompile Include="hpp_fence_pool.cpp" />
+    <ClCompile Include="rendering\hpp_subpass.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="hpp_resource_record.cpp" />
+    <ClCompile Include="common\hpp_resource_caching.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="rendering\hpp_pipeline_state.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

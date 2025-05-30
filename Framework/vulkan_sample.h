@@ -101,12 +101,12 @@ namespace vkb
         /**
         * @brief Additional sample initialization
         */
-        bool prepare() override;
+        virtual bool prepare() override;
 
         /**
         * @brief Main loop sample events
         */
-        void update(float delta_time) override;
+        virtual void update(float delta_time) override;
 
         /**
          * @brief Prepares the render target and draws to it, calling draw_renderpass
@@ -122,8 +122,14 @@ namespace vkb
          */
         virtual void draw_renderpass(core::HPPCommandBuffer& command_buffer, vkb::rendering::HPPRenderTarget& render_target);
 
-        void finish() override;
-        bool resize(uint32_t width, uint32_t height) override;
+        virtual void finish() override;
+        virtual bool resize(uint32_t width, uint32_t height) override;
+
+        /**
+         * @brief Triggers the render pipeline, it can be overriden by samples to specialize their rendering logic
+         * @param command_buffer The command buffer to record the commands to
+         */
+        virtual void render(core::HPPCommandBuffer& command_buffer);
 
         /**
          * @brief Request features from the gpu based on what is supported
@@ -208,6 +214,10 @@ namespace vkb
         void set_render_context(std::unique_ptr<rendering::HPPRenderContext>&& render_context);
         void set_render_pipeline(std::unique_ptr<rendering::HPPRenderPipeline>&& render_pipeline);
 
+        /**
+         * @brief Set viewport and scissor state in command buffer for a given extent
+         */
+        static void set_viewport_and_scissor(const core::HPPCommandBuffer& command_buffer, const vk::Extent2D& extent);
 
         /// <summary>
         /// PRIVATE INTERFACE
