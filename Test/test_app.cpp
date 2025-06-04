@@ -15,7 +15,7 @@ bool TestApp::prepare()
     }
 
     auto render_pipeline = std::make_unique<vkb::rendering::HPPRenderPipeline>();
-    set_render_pipeline(std::move(render_pipeline));
+    // set_render_pipeline(std::move(render_pipeline));
 
     return true;
 }
