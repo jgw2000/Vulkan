@@ -22,6 +22,7 @@
     <ClInclude Include="builder_base.h" />
     <ClInclude Include="common\helpers.h" />
     <ClInclude Include="common\hpp_resource_caching.h" />
+    <ClInclude Include="common\string_util.h" />
     <ClInclude Include="common\vk_common.h" />
     <ClInclude Include="core\allocated.h" />
     <ClInclude Include="core\hpp_command_buffer.h" />
@@ -32,10 +33,16 @@
     <ClInclude Include="core\hpp_image_view.h" />
     <ClInclude Include="core\hpp_instance.h" />
     <ClInclude Include="core\hpp_physical_device.h" />
+    <ClInclude Include="core\hpp_pipeline_layout.h" />
     <ClInclude Include="core\hpp_queue.h" />
     <ClInclude Include="core\hpp_render_pass.h" />
+    <ClInclude Include="core\hpp_shader_module.h" />
     <ClInclude Include="core\hpp_swapchain.h" />
     <ClInclude Include="core\vulkan_resource.h" />
+    <ClInclude Include="filesystem\filesystem.h" />
+    <ClInclude Include="filesystem\legacy.h" />
+    <ClInclude Include="filesystem\std_filesystem.h" />
+    <ClInclude Include="glsl_compiler.h" />
     <ClInclude Include="hpp_fence_pool.h" />
     <ClInclude Include="hpp_resource_cache.h" />
     <ClInclude Include="hpp_resource_record.h" />
@@ -49,12 +56,14 @@
     <ClInclude Include="rendering\hpp_render_pipeline.h" />
     <ClInclude Include="rendering\hpp_render_target.h" />
     <ClInclude Include="rendering\hpp_subpass.h" />
+    <ClInclude Include="spirv_reflection.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="vulkan_sample.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="builder_base.cpp" />
     <ClCompile Include="common\hpp_resource_caching.cpp" />
+    <ClCompile Include="common\string_util.cpp" />
     <ClCompile Include="common\vk_common.cpp" />
     <ClCompile Include="core\allocated.cpp" />
     <ClCompile Include="core\hpp_command_buffer.cpp" />
@@ -65,10 +74,16 @@
     <ClCompile Include="core\hpp_image_view.cpp" />
     <ClCompile Include="core\hpp_instance.cpp" />
     <ClCompile Include="core\hpp_physical_device.cpp" />
+    <ClCompile Include="core\hpp_pipeline_layout.cpp" />
     <ClCompile Include="core\hpp_queue.cpp" />
     <ClCompile Include="core\hpp_render_pass.cpp" />
+    <ClCompile Include="core\hpp_shader_module.cpp" />
     <ClCompile Include="core\hpp_swapchain.cpp" />
     <ClCompile Include="core\vulkan_resource.cpp" />
+    <ClCompile Include="filesystem\filesystem.cpp" />
+    <ClCompile Include="filesystem\legacy.cpp" />
+    <ClCompile Include="filesystem\std_filesystem.cpp" />
+    <ClCompile Include="glsl_compiler.cpp" />
     <ClCompile Include="hpp_fence_pool.cpp" />
     <ClCompile Include="hpp_resource_cache.cpp" />
     <ClCompile Include="hpp_resource_record.cpp" />
@@ -82,6 +97,7 @@
     <ClCompile Include="rendering\hpp_render_pipeline.cpp" />
     <ClCompile Include="rendering\hpp_render_target.cpp" />
     <ClCompile Include="rendering\hpp_subpass.cpp" />
+    <ClCompile Include="spirv_reflection.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="vulkan_sample.cpp" />
   </ItemGroup>

@@ -22,6 +22,10 @@
 #include "common/vk_common.h"
 #include "platform/window.h"
 
+#include "filesystem/legacy.h"
+#include "filesystem/filesystem.h"
+#include "filesystem/std_filesystem.h"
+
 #include "core/allocated.h"
 #include "core/vulkan_resource.h"
 #include "core/hpp_instance.h"
@@ -35,6 +39,8 @@
 #include "core/hpp_command_pool.h"
 #include "core/hpp_command_buffer.h"
 #include "core/hpp_framebuffer.h"
+#include "core/hpp_pipeline_layout.h"
+#include "core/hpp_shader_module.h"
 
 #include "rendering/hpp_render_target.h"
 #include "rendering/hpp_render_frame.h"

@@ -1,5 +1,10 @@
 #pragma once
 
+namespace vkb::core
+{
+    class HPPPipelineLayout;
+}
+
 namespace vkb::rendering
 {
     struct HPPVertexInputState
@@ -77,5 +82,57 @@ namespace vkb::rendering
         vk::Bool32                                logic_op_enable = false;
         vk::LogicOp                               logic_op        = vk::LogicOp::eClear;
         std::vector<HPPColorBlendAttachmentState> attachments;
+    };
+
+    class HPPPipelineState
+    {
+    public:
+        const vkb::core::HPPPipelineLayout& get_pipeline_layout() const      { return *pipeline_layout; }
+        const vkb::core::HPPRenderPass*     get_render_pass() const          { return render_pass; }
+        const HPPVertexInputState&          get_vertex_input_state() const   { return vertex_input_state; }
+        const HPPInputAssemblyState&        get_input_assembly_state() const { return input_assembly_state; }
+        const HPPViewportState&             get_viewport_state() const       { return viewport_state; }
+        const HPPRasterizationState&        get_rasterization_state() const  { return rasterization_state; }
+        const HPPMultisampleState&          get_multisample_state() const    { return multisample_state; }
+        const HPPDepthStencilState&         get_depth_stencil_state() const  { return depth_stencil_state; }
+        const HPPColorBlendState&           get_color_blend_state() const    { return color_blend_state; }
+        uint32_t                            get_subpass_index() const        { return subpass_index; }
+        bool                                is_dirty() const                 { return dirty; /* TODO */ }
+        void                                clear_dirty()                    { dirty = false; /* TODO */ }
+
+        void reset();
+        void set_pipeline_layout(vkb::core::HPPPipelineLayout& pipeline_layout);
+        void set_render_pass(const vkb::core::HPPRenderPass& render_pass);
+        void set_vertex_input_state(const HPPVertexInputState& vertex_input_state);
+        void set_input_assembly_state(const HPPInputAssemblyState& input_assembly_state);
+        void set_viewport_state(const HPPViewportState& viewport_state);
+        void set_rasterization_state(const HPPRasterizationState& rasterization_state);
+        void set_multisample_state(const HPPMultisampleState& multisample_state);
+        void set_depth_stencil_state(const HPPDepthStencilState& depth_stencil_state);
+        void set_color_blend_state(const HPPColorBlendState& color_blend_state);
+        void set_subpass_index(uint32_t subpass_index);
+
+    private:
+        bool dirty{ false };
+
+        vkb::core::HPPPipelineLayout* pipeline_layout{ nullptr };
+
+        const vkb::core::HPPRenderPass* render_pass{ nullptr };
+
+        HPPVertexInputState vertex_input_state{};
+
+        HPPInputAssemblyState input_assembly_state{};
+
+        HPPViewportState viewport_state{};
+
+        HPPRasterizationState rasterization_state{};
+
+        HPPMultisampleState multisample_state{};
+
+        HPPDepthStencilState depth_stencil_state{};
+
+        HPPColorBlendState color_blend_state{};
+
+        uint32_t subpass_index{ 0 };
     };
 }

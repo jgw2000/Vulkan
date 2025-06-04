@@ -54,7 +54,7 @@ namespace vkb
      * @param physical_device The physical device to check the depth formats against
      * @param depth_only (Optional) Wether to include the stencil component in the format or not
      * @param depth_format_priority_list (Optional) The list of depth formats to prefer over one another
-     *		  By default we start with the highest precision packed format
+     *          By default we start with the highest precision packed format
      * @return The valid suited depth format
      */
     vk::Format get_suitable_depth_format(

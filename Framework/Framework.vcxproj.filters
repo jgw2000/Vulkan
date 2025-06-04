@@ -13,6 +13,9 @@
     <Filter Include="common">
       <UniqueIdentifier>{dd012ddf-a1bd-4d6e-b6d9-4a130eee1228}</UniqueIdentifier>
     </Filter>
+    <Filter Include="filesystem">
+      <UniqueIdentifier>{72fbe22a-acbc-4415-befd-ca984d183342}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform\application.h">
@@ -97,6 +100,26 @@
     <ClInclude Include="rendering\hpp_pipeline_state.h">
       <Filter>rendering</Filter>
     </ClInclude>
+    <ClInclude Include="core\hpp_pipeline_layout.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="core\hpp_shader_module.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystem\legacy.h">
+      <Filter>filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystem\filesystem.h">
+      <Filter>filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystem\std_filesystem.h">
+      <Filter>filesystem</Filter>
+    </ClInclude>
+    <ClInclude Include="common\string_util.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="glsl_compiler.h" />
+    <ClInclude Include="spirv_reflection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="platform\application.cpp">
@@ -178,5 +201,25 @@
     <ClCompile Include="rendering\hpp_pipeline_state.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
+    <ClCompile Include="core\hpp_pipeline_layout.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="core\hpp_shader_module.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystem\legacy.cpp">
+      <Filter>filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystem\filesystem.cpp">
+      <Filter>filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystem\std_filesystem.cpp">
+      <Filter>filesystem</Filter>
+    </ClCompile>
+    <ClCompile Include="common\string_util.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="glsl_compiler.cpp" />
+    <ClCompile Include="spirv_reflection.cpp" />
   </ItemGroup>
 </Project>

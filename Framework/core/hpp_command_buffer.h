@@ -1,8 +1,10 @@
 #pragma once
+#include "rendering/hpp_pipeline_state.h"
 
 namespace vkb::rendering
 {
     class HPPSubpass;
+    class HPPPipelineState;
 }
 
 namespace vkb::core
@@ -74,9 +76,10 @@ namespace vkb::core
         void begin_impl(vk::CommandBufferUsageFlags flags, const HPPRenderPass* render_pass, const HPPFramebuffer* framebuffer, uint32_t subpass_index);
 
     private:
-        HPPCommandPool&              command_pool;
-        const HPPRenderPass*         current_render_pass = nullptr;
-        const HPPFramebuffer*        current_framebuffer = nullptr;
-        const vk::CommandBufferLevel level = {};
+        HPPCommandPool&                  command_pool;
+        const HPPRenderPass*             current_render_pass = nullptr;
+        const HPPFramebuffer*            current_framebuffer = nullptr;
+        const vk::CommandBufferLevel     level = {};
+        vkb::rendering::HPPPipelineState pipeline_state = {};
     };
 }

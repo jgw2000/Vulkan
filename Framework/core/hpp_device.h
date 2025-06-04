@@ -5,6 +5,7 @@
 namespace vkb::core
 {
     class HPPPhysicalDevice;
+    class HPPCommandPool;
 
     class HPPDevice : public VulkanResource<vk::Device>
     {
@@ -57,7 +58,7 @@ namespace vkb::core
         std::vector<std::vector<HPPQueue>> queues;
 
         // A command pool associated to the primary queue
-        // std::unique_ptr<HPPCommandPool> command_pool;
+        std::unique_ptr<HPPCommandPool> command_pool;
 
         vkb::HPPResourceCache resource_cache;
     };
